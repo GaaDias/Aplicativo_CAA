@@ -8,6 +8,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Futuramente trocar os Icons pelas imagens do Arasaac
   final List<Cards> buttons = [
     Cards("sim", Colors.green, Icons.thumb_up_alt_sharp),
     Cards("eu", Colors.yellow, Icons.person),
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: clearWords,
-            child: Text("Clear"),
+            child: Text("Limpar"),
           ),
           SizedBox(height: 10),
           Expanded(
