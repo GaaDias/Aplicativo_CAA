@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
+import 'communication.dart';
+import 'settings.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,7 +10,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Futuramente trocar os Icons pelas imagens do Arasaac
   final List<Cards> buttons = [
     Cards("sim", Colors.green, Icons.thumb_up_alt_sharp),
     Cards("eu", Colors.yellow, Icons.person),
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<String> selectedWords = [];
+  int _selectedIndex = 0;
 
   void addWord(String word) {
     setState(() {
@@ -38,49 +40,83 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            color: Colors.white,
-            height: 50,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                selectedWords.join(" "),
-                style: TextStyle(color: Colors.black, fontSize: 18),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF4C4C4C), 
+        iconTheme: const IconThemeData(
+          color: Colors.white, 
+        ),
+        leadingWidth: 100,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  // ação do menu
+                },
+                tooltip: 'Menu',
               ),
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  _onItemTapped(0); // Vai pra tela "Comunicação", mas vamos mudar isso
+                },
+                tooltip: 'Home',
+              ),
+            ],
+          ),
+        ),
+        title: Text(
+          _selectedIndex == 0 ? 'Comunicação' : 'Configurações',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, 
+          ),
+        ),
+        centerTitle: true, 
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 2.0),
+            child: IconButton(
+              icon: const Icon(Icons.print),
+              onPressed: () {
+                // Ação para imprimir
+              },
+              tooltip: 'Imprimir',
             ),
           ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: clearWords,
-            child: Text("Limpar"),
-          ),
-          SizedBox(height: 10),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                childAspectRatio: 1.3,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-              ),
-              itemCount: buttons.length,
-              itemBuilder: (context, index) {
-                return CardsWidget(
-                  button: buttons[index],
-                  onTap: () => addWord(buttons[index].label),
-                );
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                _onItemTapped(1);
               },
+              tooltip: 'Configurações',
             ),
           ),
         ],
       ),
+      body: _selectedIndex == 0
+          ? Communication(
+              buttons: buttons,
+              selectedWords: selectedWords,
+              addWord: addWord,
+              clearWords: clearWords,
+            )
+          : Settings(),
     );
   }
 }

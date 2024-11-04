@@ -9,17 +9,8 @@ class TDSnapApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: Text('App TEA'),
-          backgroundColor: Colors.black87,
-          actions: [
-            IconButton(icon: Icon(Icons.settings), onPressed: () {}),
-          ],
-        ),
-        body: HomePage(),
-      ),
+      debugShowCheckedModeBanner: false, // oculta o "debug"
+      home: HomePage(),
     );
   }
 }

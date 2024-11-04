@@ -20,10 +20,10 @@ class CardsWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(button.icon, size: 30, color: Colors.black),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               button.label,
-              style: TextStyle(fontSize: 16, color: Colors.black),
+              style: const TextStyle(fontSize: 16, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
