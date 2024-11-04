@@ -3,32 +3,49 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
 
-class Communication extends StatelessWidget {
+class Communication extends StatefulWidget {
   final List<Cards> buttons;
   final List<String> selectedWords;
   final Function addWord;
   final Function clearWords;
+  final bool isMenuVisible;
+  final VoidCallback toggleMenu;
 
   Communication({
     required this.buttons,
     required this.selectedWords,
     required this.addWord,
     required this.clearWords,
+    required this.isMenuVisible,
+    required this.toggleMenu,
   });
 
   @override
+  _CommunicationState createState() => _CommunicationState();
+}
+
+class _CommunicationState extends State<Communication> with SingleTickerProviderStateMixin {
+  final GlobalKey _parentContainerKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double menuWidth = screenWidth > 600 ? screenWidth * 0.2 : screenWidth * 0.3;
+    final int gridCrossAxisCount = screenWidth > 600 ? 4 : 2;
+
     return Column(
       children: [
         Container(
-          width: double.infinity, // largura da tela toda
+          key: _parentContainerKey,
+          width: double.infinity,
           padding: const EdgeInsets.all(8.0),
-          color: const Color.fromARGB(255, 182, 182, 182), // Cor de fundo do container pai
+          color: const Color.fromARGB(255, 182, 182, 182),
           child: Row(
             children: [
+              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () {
-                  // ação da voz
+                  // Ação para "falar" as palavras selecionadas
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(90, 70),
@@ -41,39 +58,39 @@ class Communication extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SvgPicture.asset(
-                      'assets/icons/f7--chat-bubble-fill.svg', 
+                      'assets/icons/f7--chat-bubble-fill.svg',
                       width: 24,
                       height: 24,
-                      color: Color(0xFF4C4C4C), 
+                      color: Color(0xFF4C4C4C),
                     ),
                     const SizedBox(height: 4),
                     const Text("Falar", style: TextStyle(color: Colors.black)),
                   ],
                 ),
               ),
-              const SizedBox(width: 10), // Espaço do botão para o container filho
+              const SizedBox(width: 10),
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  height: 60, 
+                  height: 60,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12), 
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      selectedWords.join(" "),
+                      widget.selectedWords.join(" "),
                       style: const TextStyle(color: Colors.black, fontSize: 18),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 10), // Espaço entre o container filho e o botão
+              const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () => clearWords(),
+                onPressed: () => widget.clearWords(),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(90, 70), 
+                  minimumSize: const Size(90, 70),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -83,7 +100,7 @@ class Communication extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.backspace, color: Color(0xFF4C4C4C)),
-                    const SizedBox(height: 4), // Espaço entre o ícone e o texto
+                    const SizedBox(height: 4),
                     const Text("Apagar", style: TextStyle(color: Colors.black)),
                   ],
                 ),
@@ -93,20 +110,63 @@ class Communication extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 1.3,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemCount: buttons.length,
-            itemBuilder: (context, index) {
-              return CardsWidget(
-                button: buttons[index],
-                onTap: () => addWord(buttons[index].label),
-              );
-            },
+          child: Row(
+            children: [
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: Container(
+                  width: widget.isMenuVisible ? menuWidth : 0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: widget.isMenuVisible
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.settings),
+                              title: Text("Settings"),
+                              onTap: widget.toggleMenu,
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.info),
+                              title: Text("About"),
+                              onTap: widget.toggleMenu,
+                            ),
+                            // Outros itens do menu
+                          ],
+                        )
+                      : null,
+                ),
+              ),
+              Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  width: widget.isMenuVisible ? screenWidth - menuWidth : screenWidth,
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridCrossAxisCount,
+                      childAspectRatio: 1.3,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
+                    ),
+                    itemCount: widget.buttons.length,
+                    itemBuilder: (context, index) {
+                      return CardsWidget(
+                        button: widget.buttons[index],
+                        onTap: () => widget.addWord(widget.buttons[index].label),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

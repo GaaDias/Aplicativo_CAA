@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   List<String> selectedWords = [];
   int _selectedIndex = 0;
+  bool _isMenuVisible = false;
 
   void addWord(String word) {
     setState(() {
@@ -37,6 +38,12 @@ class _HomePageState extends State<HomePage> {
   void clearWords() {
     setState(() {
       selectedWords.clear();
+    });
+  }
+
+  void _toggleMenu() {
+    setState(() {
+      _isMenuVisible = !_isMenuVisible;
     });
   }
 
@@ -62,15 +69,13 @@ class _HomePageState extends State<HomePage> {
             children: [
               IconButton(
                 icon: const Icon(Icons.menu),
-                onPressed: () {
-                  // ação do menu
-                },
+                onPressed: _toggleMenu, // Alterna o menu de Communication
                 tooltip: 'Menu',
               ),
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  _onItemTapped(0); // Vai pra tela "Comunicação", mas vamos mudar isso
+                  _onItemTapped(0); // Vai pra tela "Comunicação"
                 },
                 tooltip: 'Home',
               ),
@@ -115,6 +120,8 @@ class _HomePageState extends State<HomePage> {
               selectedWords: selectedWords,
               addWord: addWord,
               clearWords: clearWords,
+              isMenuVisible: _isMenuVisible, // Passa a visibilidade para Communication
+              toggleMenu: _toggleMenu, // Passa a função de alternância para Communication
             )
           : Settings(),
     );
