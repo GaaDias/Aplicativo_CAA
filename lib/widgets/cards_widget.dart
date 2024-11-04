@@ -9,6 +9,10 @@ class CardsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double iconSize = screenWidth > 800 ? 30 : 24;
+    final double fontSize = screenWidth > 800 ? 16 : 14;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -19,11 +23,11 @@ class CardsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(button.icon, size: 30, color: Colors.black),
+            Icon(button.icon, size: iconSize, color: Colors.black),
             const SizedBox(height: 5),
             Text(
               button.label,
-              style: const TextStyle(fontSize: 16, color: Colors.black),
+              style: TextStyle(fontSize: fontSize, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],

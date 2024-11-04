@@ -30,8 +30,9 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double menuWidth = screenWidth > 600 ? screenWidth * 0.2 : screenWidth * 0.3;
-    final int gridCrossAxisCount = screenWidth > 600 ? 4 : 2;
+    final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
+    final int gridCrossAxisCount = screenWidth > 800 ? 5 : screenWidth > 600 ? 4 : 2;
+    final double childAspectRatio = screenWidth > 800 ? 1.2 : 1.3;
 
     return Column(
       children: [
@@ -48,8 +49,8 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                   // Ação para "falar" as palavras selecionadas
                 },
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(90, 70),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  minimumSize: Size(screenWidth * 0.12, 60), // Tamanho limitado
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -81,7 +82,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                     alignment: Alignment.centerLeft,
                     child: Text(
                       widget.selectedWords.join(" "),
-                      style: const TextStyle(color: Colors.black, fontSize: 18),
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
                     ),
                   ),
                 ),
@@ -90,8 +91,8 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
               ElevatedButton(
                 onPressed: () => widget.clearWords(),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(90, 70),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  minimumSize: Size(screenWidth * 0.12, 60), // Tamanho limitado
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -99,7 +100,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.backspace, color: Color(0xFF4C4C4C)),
+                    Icon(Icons.backspace, color: Color(0xFF4C4C4C), size: 24),
                     const SizedBox(height: 4),
                     const Text("Apagar", style: TextStyle(color: Colors.black)),
                   ],
@@ -138,7 +139,6 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                               title: Text("About"),
                               onTap: widget.toggleMenu,
                             ),
-                            // Outros itens do menu
                           ],
                         )
                       : null,
@@ -152,7 +152,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: gridCrossAxisCount,
-                      childAspectRatio: 1.3,
+                      childAspectRatio: childAspectRatio,
                       mainAxisSpacing: 4,
                       crossAxisSpacing: 4,
                     ),

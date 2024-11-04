@@ -61,26 +61,27 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(
           color: Colors.white, 
         ),
-        leadingWidth: 100,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
+        leadingWidth: 100, // Ajuste de largura para comportar o Row
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: IconButton(
                 icon: const Icon(Icons.menu),
                 onPressed: _toggleMenu, // Alterna o menu de Communication
                 tooltip: 'Menu',
               ),
-              IconButton(
+            ),
+            Expanded(
+              child: IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
                   _onItemTapped(0); // Vai pra tela "Comunicação"
                 },
                 tooltip: 'Home',
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         title: Text(
           _selectedIndex == 0 ? 'Comunicação' : 'Configurações',
@@ -92,25 +93,19 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true, 
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 2.0),
-            child: IconButton(
-              icon: const Icon(Icons.print),
-              onPressed: () {
-                // Ação para imprimir
-              },
-              tooltip: 'Imprimir',
-            ),
+          IconButton(
+            icon: const Icon(Icons.print),
+            onPressed: () {
+              // Ação para imprimir
+            },
+            tooltip: 'Imprimir',
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                _onItemTapped(1);
-              },
-              tooltip: 'Configurações',
-            ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              _onItemTapped(1);
+            },
+            tooltip: 'Configurações',
           ),
         ],
       ),
@@ -120,8 +115,8 @@ class _HomePageState extends State<HomePage> {
               selectedWords: selectedWords,
               addWord: addWord,
               clearWords: clearWords,
-              isMenuVisible: _isMenuVisible, // Passa a visibilidade para Communication
-              toggleMenu: _toggleMenu, // Passa a função de alternância para Communication
+              isMenuVisible: _isMenuVisible,
+              toggleMenu: _toggleMenu,
             )
           : Settings(),
     );
