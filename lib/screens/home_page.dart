@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/cards.dart';
-import '../widgets/cards_widget.dart';
 import 'communication.dart';
 import 'settings.dart';
 
@@ -10,19 +9,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Cards> buttons = [
-    Cards("sim", Colors.green, Icons.thumb_up_alt_sharp),
-    Cards("eu", Colors.yellow, Icons.person),
-    Cards("preciso", Colors.pink, Icons.pan_tool),
-    Cards("banheiro", Colors.blue, Icons.bathroom),
-    Cards("não", Colors.green, Icons.thumb_down),
-    Cards("você", Colors.yellow, Icons.person_outline),
-    Cards("tenho", Colors.pink, Icons.accessibility_new),
-    Cards("comer", Colors.blue, Icons.sentiment_satisfied),
-    Cards("não sei", Colors.green, Icons.person_2),
-    Cards("nós", Colors.yellow, Icons.person_pin),
-    Cards("quero", Colors.pink, Icons.back_hand),
-    Cards("brincar", Colors.blue, Icons.play_circle)
+  // Define os cards com cor branca inicialmente
+  List<Cards> buttons = [
+    Cards("sim", Colors.white, Icons.thumb_up_alt_sharp),
+    Cards("eu", Colors.white, Icons.person),
+    Cards("preciso", Colors.white, Icons.pan_tool),
+    Cards("banheiro", Colors.white, Icons.bathroom),
+    Cards("não", Colors.white, Icons.thumb_down),
+    Cards("você", Colors.white, Icons.person_outline),
+    Cards("tenho", Colors.white, Icons.accessibility_new),
+    Cards("comer", Colors.white, Icons.sentiment_satisfied),
+    Cards("não sei", Colors.white, Icons.person_2),
+    Cards("nós", Colors.white, Icons.person_pin),
+    Cards("quero", Colors.white, Icons.back_hand),
+    Cards("brincar", Colors.white, Icons.play_circle)
   ];
 
   List<String> selectedWords = [];
@@ -61,25 +61,21 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(
           color: Colors.white, 
         ),
-        leadingWidth: 100, // Ajuste de largura para comportar o Row
+        leadingWidth: 100,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: _toggleMenu, // Alterna o menu de Communication
-                tooltip: 'Menu',
-              ),
+            IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: _toggleMenu,
+              tooltip: 'Menu',
             ),
-            Expanded(
-              child: IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  _onItemTapped(0); // Vai pra tela "Comunicação"
-                },
-                tooltip: 'Home',
-              ),
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                _onItemTapped(0);
+              },
+              tooltip: 'Home',
             ),
           ],
         ),

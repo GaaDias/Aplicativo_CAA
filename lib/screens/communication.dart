@@ -31,8 +31,9 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
-    final int gridCrossAxisCount = screenWidth > 800 ? 5 : screenWidth > 600 ? 4 : 2;
-    final double childAspectRatio = screenWidth > 800 ? 1.2 : 1.3;
+    
+    // Define espaçamento entre os cards
+    final double cardSpacing = 35.0;
 
     return Column(
       children: [
@@ -49,7 +50,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                   // Ação para "falar" as palavras selecionadas
                 },
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(screenWidth * 0.12, 60), // Tamanho limitado
+                  minimumSize: Size(screenWidth * 0.12, 60),
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -91,7 +92,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
               ElevatedButton(
                 onPressed: () => widget.clearWords(),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(screenWidth * 0.12, 60), // Tamanho limitado
+                  minimumSize: Size(screenWidth * 0.12, 60),
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -109,7 +110,7 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         Expanded(
           child: Row(
             children: [
@@ -149,20 +150,22 @@ class _CommunicationState extends State<Communication> with SingleTickerProvider
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   width: widget.isMenuVisible ? screenWidth - menuWidth : screenWidth,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: gridCrossAxisCount,
-                      childAspectRatio: childAspectRatio,
-                      mainAxisSpacing: 4,
-                      crossAxisSpacing: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0), // Espaço nas laterais
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: screenWidth > 800 ? 5 : 3,
+                        mainAxisSpacing: cardSpacing,
+                        crossAxisSpacing: cardSpacing,
+                      ),
+                      itemCount: widget.buttons.length,
+                      itemBuilder: (context, index) {
+                        return CardsWidget(
+                          button: widget.buttons[index],
+                          onTap: () => widget.addWord(widget.buttons[index].label),
+                        );
+                      },
                     ),
-                    itemCount: widget.buttons.length,
-                    itemBuilder: (context, index) {
-                      return CardsWidget(
-                        button: widget.buttons[index],
-                        onTap: () => widget.addWord(widget.buttons[index].label),
-                      );
-                    },
                   ),
                 ),
               ),
