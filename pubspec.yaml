@@ -11,6 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  reorderable_grid_view: ^2.0.0
   http: ^1.2.2
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.11  # Dependência para usar SVGs

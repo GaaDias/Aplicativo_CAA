@@ -4,24 +4,22 @@ import '../models/cards.dart';
 class CardsWidget extends StatelessWidget {
   final Cards button;
   final VoidCallback onTap;
+  final double iconSize; // Adicionado o parâmetro iconSize
+  final double fontSize; // Adicionado o parâmetro fontSize
 
-  CardsWidget({required this.button, required this.onTap});
+  CardsWidget({
+    Key? key,
+    required this.button,
+    required this.onTap,
+    this.iconSize = 24.0, // Define um valor padrão para iconSize
+    this.fontSize = 14.0, // Define um valor padrão para fontSize
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    
-    // Defina o tamanho dos cards diretamente aqui
-    final double cardWidth = screenWidth > 800 ? 80 : 40; // largura dos cards
-    final double cardHeight = screenWidth > 800 ? 80 : 40; // altura dos cards
-    final double iconSize = screenWidth > 800 ? 24 : 20;
-    final double fontSize = screenWidth > 800 ? 14 : 12;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: cardWidth,
-        height: cardHeight,
         decoration: BoxDecoration(
           color: button.color,
           borderRadius: BorderRadius.circular(8),

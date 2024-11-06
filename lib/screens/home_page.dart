@@ -9,21 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Define os cards com cor branca inicialmente
-  List<Cards> buttons = [
-    Cards("sim", Colors.white, Icons.thumb_up_alt_sharp),
-    Cards("eu", Colors.white, Icons.person),
-    Cards("preciso", Colors.white, Icons.pan_tool),
-    Cards("banheiro", Colors.white, Icons.bathroom),
-    Cards("não", Colors.white, Icons.thumb_down),
-    Cards("você", Colors.white, Icons.person_outline),
-    Cards("tenho", Colors.white, Icons.accessibility_new),
-    Cards("comer", Colors.white, Icons.sentiment_satisfied),
-    Cards("não sei", Colors.white, Icons.person_2),
-    Cards("nós", Colors.white, Icons.person_pin),
-    Cards("quero", Colors.white, Icons.back_hand),
-    Cards("brincar", Colors.white, Icons.play_circle)
-  ];
+  List<Cards> buttons = [Cards("", Colors.white, Icons.add)]; // Apenas o ícone de "+"
 
   List<String> selectedWords = [];
   int _selectedIndex = 0;
@@ -53,13 +39,127 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _addNewCard() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String label = "";
+        IconData selectedIcon = Icons.person;
+        Color selectedColor = Colors.white;
+        final List<IconData> icons = [
+          Icons.person,
+          Icons.home,
+          Icons.favorite,
+          Icons.thumb_up,
+          Icons.star,
+          Icons.cake,
+          Icons.access_alarm,
+        ];
+        final List<Color> colors = [
+          Colors.white,
+          Colors.red,
+          Colors.blue,
+          Colors.green,
+          Colors.yellow,
+          Colors.orange,
+          Colors.purple,
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text("Personalizar Card"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (value) => label = value,
+                    decoration: InputDecoration(labelText: "Palavra"),
+                  ),
+                  const SizedBox(height: 16),
+                  Text("Selecione um Ícone"),
+                  Wrap(
+                    spacing: 8,
+                    children: icons.map((icon) {
+                      return GestureDetector(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedIcon = icon;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: selectedIcon == icon ? Colors.grey[300] : null,
+                          ),
+                          child: Icon(icon, color: Colors.black),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  Text("Selecione uma Cor"),
+                  Wrap(
+                    spacing: 8,
+                    children: colors.map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedColor = color;
+                          });
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selectedColor == color ? Colors.black : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (label.isNotEmpty) {
+                      setState(() {
+                        buttons.insert(
+                          buttons.length - 1,
+                          Cards(label, selectedColor, selectedIcon),
+                        );
+                      });
+                      Navigator.of(context).pop(); // Fecha o pop-up após salvar
+                    }
+                  },
+                  child: Text("Salvar"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4C4C4C), 
+        backgroundColor: const Color(0xFF4C4C4C),
         iconTheme: const IconThemeData(
-          color: Colors.white, 
+          color: Colors.white,
         ),
         leadingWidth: 100,
         leading: Row(
@@ -84,10 +184,10 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.white, 
+            color: Colors.white,
           ),
         ),
-        centerTitle: true, 
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.print),
@@ -111,6 +211,7 @@ class _HomePageState extends State<HomePage> {
               selectedWords: selectedWords,
               addWord: addWord,
               clearWords: clearWords,
+              addNewCard: _addNewCard,
               isMenuVisible: _isMenuVisible,
               toggleMenu: _toggleMenu,
             )
