@@ -4,15 +4,15 @@ import '../models/cards.dart';
 class CardsWidget extends StatelessWidget {
   final Cards button;
   final VoidCallback onTap;
-  final double iconSize; // Adicionado o parâmetro iconSize
-  final double fontSize; // Adicionado o parâmetro fontSize
+  final double fontSize; 
+  final double iconSize; 
 
   CardsWidget({
     Key? key,
     required this.button,
     required this.onTap,
-    this.iconSize = 24.0, // Define um valor padrão para iconSize
-    this.fontSize = 14.0, // Define um valor padrão para fontSize
+    this.iconSize = 24.0, 
+    this.fontSize = 14.0, 
   }) : super(key: key);
 
   @override

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
@@ -7,7 +9,7 @@ class Communication extends StatefulWidget {
   final List<Cards> buttons;
   final List<String> selectedWords;
   final Function addWord;
-  final Function clearWords;
+  final VoidCallback clearWords;
   final VoidCallback addNewCard;
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
@@ -28,6 +30,36 @@ class Communication extends StatefulWidget {
 
 class _CommunicationState extends State<Communication> {
   final GlobalKey _parentContainerKey = GlobalKey();
+  final FlutterTts flutterTts = FlutterTts(); // Inicializa o TTS
+
+  @override
+  void initState() {
+    super.initState();
+    _configureTts(); // Configura o TTS ao iniciar
+  }
+
+  void _configureTts() async {
+    await flutterTts.setLanguage("pt-BR"); 
+    await flutterTts.setVoice({"name": "pt-br-x-afs-network", "locale": "pt-BR"}); 
+    flutterTts.setSpeechRate(0.5); // velocidade de fala
+    flutterTts.setVolume(2.0); // volume
+    flutterTts.setPitch(1.0); // tom da voz
+  }
+
+  @override
+  void dispose() {
+    flutterTts.stop(); // Para o TTS se estiver falando
+    super.dispose();
+  }
+
+  Future<void> _speakContainerContent() async {
+    String text = widget.selectedWords.join(" ");
+    if (text.isNotEmpty) {
+      await flutterTts.speak(text);
+    } else {
+      print("Nada para falar.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +83,7 @@ class _CommunicationState extends State<Communication> {
             children: [
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {
-                  // Ação para "falar" as palavras selecionadas
-                },
+                onPressed: _speakContainerContent, 
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(screenWidth * 0.12, 60),
                   padding: EdgeInsets.symmetric(horizontal: 12),
@@ -64,7 +94,11 @@ class _CommunicationState extends State<Communication> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.volume_up, color: Color(0xFF4C4C4C), size: 24),
+                    SvgPicture.asset(
+                      'assets/icons/f7--chat-bubble-fill.svg',
+                      width: 24,
+                      height: 24,
+                      color: Color(0xFF4C4C4C)),
                     const SizedBox(height: 4),
                     const Text("Falar", style: TextStyle(color: Colors.black)),
                   ],
@@ -90,7 +124,7 @@ class _CommunicationState extends State<Communication> {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () => widget.clearWords(),
+                onPressed: widget.clearWords,
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(screenWidth * 0.12, 60),
                   padding: EdgeInsets.symmetric(horizontal: 12),
