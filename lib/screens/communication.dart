@@ -30,25 +30,25 @@ class Communication extends StatefulWidget {
 
 class _CommunicationState extends State<Communication> {
   final GlobalKey _parentContainerKey = GlobalKey();
-  final FlutterTts flutterTts = FlutterTts(); // Inicializa o TTS
+  final FlutterTts flutterTts = FlutterTts();
 
   @override
   void initState() {
     super.initState();
-    _configureTts(); // Configura o TTS ao iniciar
+    _configureTts();
   }
 
   void _configureTts() async {
-    await flutterTts.setLanguage("pt-BR"); 
-    await flutterTts.setVoice({"name": "pt-br-x-afs-network", "locale": "pt-BR"}); 
-    flutterTts.setSpeechRate(0.5); // velocidade de fala
-    flutterTts.setVolume(2.0); // volume
-    flutterTts.setPitch(1.0); // tom da voz
+    await flutterTts.setLanguage("pt-BR");
+    await flutterTts.setVoice({"name": "pt-br-x-afs-network", "locale": "pt-BR"});
+    flutterTts.setSpeechRate(0.5);
+    flutterTts.setVolume(1.0);
+    flutterTts.setPitch(1.0);
   }
 
   @override
   void dispose() {
-    flutterTts.stop(); // Para o TTS se estiver falando
+    flutterTts.stop();
     super.dispose();
   }
 
@@ -56,20 +56,20 @@ class _CommunicationState extends State<Communication> {
     String text = widget.selectedWords.join(" ");
     if (text.isNotEmpty) {
       await flutterTts.speak(text);
-    } else {
-      print("Nada para falar.");
     }
+  }
+
+  void _addNewCard(String label, IconData icon, Color color) {
+    setState(() {
+      widget.buttons.insert(0, Cards(label, color, icon)); // Adiciona o novo card na primeira posição
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
-
-    // Define o número de colunas para o grid de acordo com a largura da tela
     final int crossAxisCount = screenWidth > 800 ? 5 : 3;
-
-    // Define o tamanho do card para calcular tamanhos responsivos
     final double cardWidth = (screenWidth - 32 - ((crossAxisCount - 1) * 20)) / crossAxisCount;
 
     return Column(
@@ -83,10 +83,9 @@ class _CommunicationState extends State<Communication> {
             children: [
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: _speakContainerContent, 
+                onPressed: _speakContainerContent,
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(screenWidth * 0.12, 60),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -98,7 +97,8 @@ class _CommunicationState extends State<Communication> {
                       'assets/icons/f7--chat-bubble-fill.svg',
                       width: 24,
                       height: 24,
-                      color: Color(0xFF4C4C4C)),
+                      color: const Color(0xFF4C4C4C),
+                    ),
                     const SizedBox(height: 4),
                     const Text("Falar", style: TextStyle(color: Colors.black)),
                   ],
@@ -127,7 +127,6 @@ class _CommunicationState extends State<Communication> {
                 onPressed: widget.clearWords,
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(screenWidth * 0.12, 60),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -135,7 +134,7 @@ class _CommunicationState extends State<Communication> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.backspace, color: Color(0xFF4C4C4C), size: 24),
+                    const Icon(Icons.backspace, color: Color(0xFF4C4C4C), size: 24),
                     const SizedBox(height: 4),
                     const Text("Apagar", style: TextStyle(color: Colors.black)),
                   ],
@@ -165,13 +164,13 @@ class _CommunicationState extends State<Communication> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ListTile(
-                              leading: Icon(Icons.settings),
-                              title: Text("Settings"),
+                              leading: const Icon(Icons.settings),
+                              title: const Text("Settings"),
                               onTap: widget.toggleMenu,
                             ),
                             ListTile(
-                              leading: Icon(Icons.info),
-                              title: Text("About"),
+                              leading: const Icon(Icons.info),
+                              title: const Text("About"),
                               onTap: widget.toggleMenu,
                             ),
                           ],
@@ -194,23 +193,17 @@ class _CommunicationState extends State<Communication> {
                       return CardsWidget(
                         key: ValueKey(card),
                         button: card,
-                        iconSize: cardWidth * 0.4, // Ícone responsivo
-                        fontSize: cardWidth * 0.15, // Fonte responsiva
+                        iconSize: cardWidth * 0.4,
+                        fontSize: cardWidth * 0.15,
                         onTap: () {
-                          if (card.icon == Icons.add) {
-                            widget.addNewCard();
-                          } else {
-                            widget.addWord(card.label);
-                          }
+                          widget.addWord(card.label);
                         },
                       );
                     },
                     onReorder: (oldIndex, newIndex) {
-                      if (widget.buttons[oldIndex].icon == Icons.add || newIndex >= widget.buttons.length - 1) return;
-
                       setState(() {
                         final card = widget.buttons.removeAt(oldIndex);
-                        widget.buttons.insert(newIndex, card);
+                        widget.buttons.insert(newIndex, card); // Reordena livremente
                       });
                     },
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/cards.dart';
 import 'communication.dart';
 import 'settings.dart';
+import 'historyScreen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Cards> buttons = [Cards("", Colors.white, Icons.add)]; // Apenas o ícone de "+"
+  List<Cards> buttons = []; // Lista de cards
 
   List<String> selectedWords = [];
   int _selectedIndex = 0;
@@ -37,6 +38,15 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _navigateToHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HistoryScreen(),
+      ),
+    );
   }
 
   void _addNewCard() {
@@ -135,10 +145,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     if (label.isNotEmpty) {
                       setState(() {
-                        buttons.insert(
-                          buttons.length - 1,
-                          Cards(label, selectedColor, selectedIcon),
-                        );
+                        buttons.insert(0, Cards(label, selectedColor, selectedIcon)); // Adiciona na primeira posição
                       });
                       Navigator.of(context).pop(); // Fecha o pop-up após salvar
                     }
@@ -161,7 +168,7 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        leadingWidth: 100,
+        leadingWidth: 150,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -177,6 +184,11 @@ class _HomePageState extends State<HomePage> {
               },
               tooltip: 'Home',
             ),
+            IconButton(
+              icon: const Icon(Icons.bar_chart), // Ícone de evolução
+              onPressed: _navigateToHistory,
+              tooltip: 'Histórico e Evolução',
+            ),
           ],
         ),
         title: Text(
@@ -189,6 +201,11 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add), // Ícone de adicionar card
+            onPressed: _addNewCard,
+            tooltip: 'Criar Card',
+          ),
           IconButton(
             icon: const Icon(Icons.print),
             onPressed: () {
