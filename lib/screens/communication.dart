@@ -14,6 +14,7 @@ class Communication extends StatefulWidget {
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
   final bool isEditMode;
+  final int columns;
 
   Communication({
     required this.buttons,
@@ -24,6 +25,7 @@ class Communication extends StatefulWidget {
     required this.isMenuVisible,
     required this.toggleMenu,
     required this.isEditMode,
+    required this.columns,
   });
 
   @override
@@ -174,10 +176,12 @@ class _CommunicationState extends State<Communication> {
 
   @override
   Widget build(BuildContext context) {
+    final int crossAxisCount = widget.columns; // Número de colunas ajustável pelo usuário
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double cardWidth = (screenWidth - 32) / (crossAxisCount + 0.5);
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
-    final int crossAxisCount = screenWidth > 800 ? 5 : 3;
-    final double cardWidth = (screenWidth - 32 - ((crossAxisCount - 1) * 20)) / crossAxisCount;
+    final double cardSpacing = (screenWidth - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
+
 
     return Column(
       children: [
@@ -288,8 +292,9 @@ class _CommunicationState extends State<Communication> {
                       ? ReorderableGridView.builder(
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: crossAxisCount,
-                            mainAxisSpacing: 20,
-                            crossAxisSpacing: 20,
+                            crossAxisSpacing: cardSpacing, // Espaçamento horizontal automático
+                            mainAxisSpacing: cardSpacing, // Espaçamento vertical automático
+                            childAspectRatio: 1, // Proporção largura/altura dos cards
                           ),
                           itemCount: widget.buttons.length,
                           itemBuilder: (context, index) {
@@ -298,7 +303,7 @@ class _CommunicationState extends State<Communication> {
                               key: ValueKey(card),
                               button: card,
                               iconSize: cardWidth * 0.35,
-                              fontSize: cardWidth * 0.12,
+                              fontSize: cardWidth * 0.2,
                               onTap: () {
                                 _showEditCardDialog(card);
                               },
@@ -314,16 +319,17 @@ class _CommunicationState extends State<Communication> {
                       : GridView.builder(
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: crossAxisCount,
-                            mainAxisSpacing: 20,
-                            crossAxisSpacing: 20,
+                            crossAxisSpacing: cardSpacing, // Espaçamento horizontal automático
+                            mainAxisSpacing: cardSpacing, // Espaçamento vertical automático
+                            childAspectRatio: 1, // Proporção largura/altura dos cards
                           ),
                           itemCount: widget.buttons.length,
                           itemBuilder: (context, index) {
                             final card = widget.buttons[index];
                             return CardsWidget(
                               button: card,
-                              iconSize: cardWidth * 0.4,
-                              fontSize: cardWidth * 0.15,
+                              iconSize: cardWidth * 0.35,
+                              fontSize: cardWidth * 0.2,
                               onTap: () {
                                 widget.addWord(card.label);
                               },

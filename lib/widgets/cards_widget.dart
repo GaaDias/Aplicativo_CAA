@@ -32,7 +32,7 @@ class CardsWidget extends StatelessWidget {
               size: iconSize, 
               color: Colors.black,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 5),
             Text(
               button.label,
               style: TextStyle(

@@ -15,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool _isMenuVisible = false;
   bool _isEditMode = false;
+  int _columns = 5;
 
   void addWord(String word) {
     setState(() {
@@ -52,6 +53,12 @@ class _HomePageState extends State<HomePage> {
   void _addNewCard() {
     _showCardDialog();
   }
+
+  void _onColumnsChanged(int newColumns) {
+  setState(() {
+    _columns = newColumns; // Atualiza o número de colunas
+  });
+}
 
   void _showCardDialog({Cards? card}) {
     showDialog(
@@ -173,103 +180,111 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4C4C4C),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        leadingWidth: 150,
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: _toggleMenu,
-              tooltip: 'Menu',
-            ),
-            IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () {
-                _onItemTapped(0);
-              },
-              tooltip: 'Home',
-            ),
-            IconButton(
-              icon: const Icon(Icons.bar_chart),
-              onPressed: _navigateToHistory,
-              tooltip: 'Histórico e Evolução',
-            ),
-          ],
-        ),
-        title: Text(
-          _selectedIndex == 0 ? 'Comunicação' : 'Configurações',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Switch(
-                value: _isEditMode,
-                onChanged: (value) {
-                  setState(() {
-                    _isEditMode = value;
-                  });
-                },
-                activeTrackColor: Colors.grey, 
-                inactiveTrackColor: Colors.grey[400],
-                activeColor: Colors.black,
-                inactiveThumbColor: Colors.black,
-              ),
-              const SizedBox(width: 1),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  // Ação para edição
-                },
-                tooltip: 'Editar',
-              ),
-            ],
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: const Color(0xFF4C4C4C),
+      iconTheme: const IconThemeData(
+        color: Colors.white,
+      ),
+      leadingWidth: 150,
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: _toggleMenu,
+            tooltip: 'Menu',
           ),
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addNewCard,
-            tooltip: 'Criar Card',
-          ),
-          IconButton(
-            icon: const Icon(Icons.print),
+            icon: const Icon(Icons.home),
             onPressed: () {
-              // Ação para imprimir
+              _onItemTapped(0);
             },
-            tooltip: 'Imprimir',
+            tooltip: 'Home',
           ),
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              _onItemTapped(1);
-            },
-            tooltip: 'Configurações',
+            icon: const Icon(Icons.bar_chart),
+            onPressed: _navigateToHistory,
+            tooltip: 'Histórico e Evolução',
           ),
         ],
       ),
-      body: _selectedIndex == 0
-          ? Communication(
-              buttons: buttons,
-              selectedWords: selectedWords,
-              addWord: addWord,
-              clearWords: clearWords,
-              addNewCard: _addNewCard,
-              isMenuVisible: _isMenuVisible,
-              toggleMenu: _toggleMenu,
-              isEditMode: _isEditMode,
-            )
-          : Settings(),
+      title: Text(
+        _selectedIndex == 0 ? 'Comunicação' : 'Configurações',
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Switch(
+              value: _isEditMode,
+              onChanged: (value) {
+                setState(() {
+                  _isEditMode = value;
+                });
+              },
+              activeTrackColor: Colors.grey,
+              inactiveTrackColor: Colors.grey[400],
+              activeColor: Colors.black,
+              inactiveThumbColor: Colors.black,
+            ),
+            const SizedBox(width: 1),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                // Ação para edição
+              },
+              tooltip: 'Editar',
+            ),
+          ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: _addNewCard,
+          tooltip: 'Criar Card',
+        ),
+        IconButton(
+          icon: const Icon(Icons.print),
+          onPressed: () {
+            // Ação para imprimir
+          },
+          tooltip: 'Imprimir',
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            _onItemTapped(1);
+          },
+          tooltip: 'Configurações',
+        ),
+      ],
+    ),
+    body: _selectedIndex == 0
+        ? Communication(
+            buttons: buttons,
+            selectedWords: selectedWords,
+            addWord: addWord,
+            clearWords: clearWords,
+            addNewCard: _addNewCard,
+            isMenuVisible: _isMenuVisible,
+            toggleMenu: _toggleMenu,
+            isEditMode: _isEditMode,
+            columns: _columns,
+          )
+        : Settings(
+            currentColumns: _columns,
+            onColumnsChanged: (newColumns) {
+              setState(() {
+                _columns = newColumns;
+              });
+            },
+          ),
     );
   }
 }
