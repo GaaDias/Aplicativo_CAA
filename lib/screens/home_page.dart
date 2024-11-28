@@ -10,11 +10,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Cards> buttons = []; // Lista de cards
-
+  List<Cards> buttons = [];
   List<String> selectedWords = [];
   int _selectedIndex = 0;
   bool _isMenuVisible = false;
+  bool _isEditMode = false;
 
   void addWord(String word) {
     setState(() {
@@ -50,12 +50,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addNewCard() {
+    _showCardDialog();
+  }
+
+  void _showCardDialog({Cards? card}) {
     showDialog(
       context: context,
       builder: (context) {
-        String label = "";
-        IconData selectedIcon = Icons.person;
-        Color selectedColor = Colors.white;
+        String label = card?.label ?? "";
+        IconData selectedIcon = card?.icon ?? Icons.person;
+        Color selectedColor = card?.color ?? Colors.white;
         final List<IconData> icons = [
           Icons.person,
           Icons.home,
@@ -78,13 +82,14 @@ class _HomePageState extends State<HomePage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: Text("Personalizar Card"),
+              title: Text(card == null ? "Criar Card" : "Editar Card"),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     onChanged: (value) => label = value,
                     decoration: InputDecoration(labelText: "Palavra"),
+                    controller: TextEditingController(text: label),
                   ),
                   const SizedBox(height: 16),
                   Text("Selecione um Ícone"),
@@ -145,9 +150,15 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     if (label.isNotEmpty) {
                       setState(() {
-                        buttons.insert(0, Cards(label, selectedColor, selectedIcon)); // Adiciona na primeira posição
+                        if (card == null) {
+                          buttons.insert(0, Cards(label, selectedColor, selectedIcon));
+                        } else {
+                          card.label = label;
+                          card.icon = selectedIcon;
+                          card.color = selectedColor;
+                        }
                       });
-                      Navigator.of(context).pop(); // Fecha o pop-up após salvar
+                      Navigator.of(context).pop();
                     }
                   },
                   child: Text("Salvar"),
@@ -185,7 +196,7 @@ class _HomePageState extends State<HomePage> {
               tooltip: 'Home',
             ),
             IconButton(
-              icon: const Icon(Icons.bar_chart), // Ícone de evolução
+              icon: const Icon(Icons.bar_chart),
               onPressed: _navigateToHistory,
               tooltip: 'Histórico e Evolução',
             ),
@@ -201,8 +212,33 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         actions: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Switch(
+                value: _isEditMode,
+                onChanged: (value) {
+                  setState(() {
+                    _isEditMode = value;
+                  });
+                },
+                activeTrackColor: Colors.grey, 
+                inactiveTrackColor: Colors.grey[400],
+                activeColor: Colors.black,
+                inactiveThumbColor: Colors.black,
+              ),
+              const SizedBox(width: 1),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  // Ação para edição
+                },
+                tooltip: 'Editar',
+              ),
+            ],
+          ),
           IconButton(
-            icon: const Icon(Icons.add), // Ícone de adicionar card
+            icon: const Icon(Icons.add),
             onPressed: _addNewCard,
             tooltip: 'Criar Card',
           ),
@@ -231,6 +267,7 @@ class _HomePageState extends State<HomePage> {
               addNewCard: _addNewCard,
               isMenuVisible: _isMenuVisible,
               toggleMenu: _toggleMenu,
+              isEditMode: _isEditMode,
             )
           : Settings(),
     );

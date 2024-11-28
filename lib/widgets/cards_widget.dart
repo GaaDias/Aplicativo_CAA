@@ -11,8 +11,8 @@ class CardsWidget extends StatelessWidget {
     Key? key,
     required this.button,
     required this.onTap,
-    this.iconSize = 24.0, 
-    this.fontSize = 14.0, 
+    required this.iconSize,
+    required this.fontSize,
   }) : super(key: key);
 
   @override
@@ -27,11 +27,18 @@ class CardsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(button.icon, size: iconSize, color: Colors.black),
+            Icon(
+              button.icon,
+              size: iconSize, 
+              color: Colors.black,
+            ),
             const SizedBox(height: 4),
             Text(
               button.label,
-              style: TextStyle(fontSize: fontSize, color: Colors.black),
+              style: TextStyle(
+                fontSize: fontSize,
+                color: Colors.black,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

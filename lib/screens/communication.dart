@@ -13,6 +13,7 @@ class Communication extends StatefulWidget {
   final VoidCallback addNewCard;
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
+  final bool isEditMode;
 
   Communication({
     required this.buttons,
@@ -22,6 +23,7 @@ class Communication extends StatefulWidget {
     required this.addNewCard,
     required this.isMenuVisible,
     required this.toggleMenu,
+    required this.isEditMode,
   });
 
   @override
@@ -29,7 +31,6 @@ class Communication extends StatefulWidget {
 }
 
 class _CommunicationState extends State<Communication> {
-  final GlobalKey _parentContainerKey = GlobalKey();
   final FlutterTts flutterTts = FlutterTts();
 
   @override
@@ -41,9 +42,9 @@ class _CommunicationState extends State<Communication> {
   void _configureTts() async {
     await flutterTts.setLanguage("pt-BR");
     await flutterTts.setVoice({"name": "pt-br-x-afs-network", "locale": "pt-BR"});
-    flutterTts.setSpeechRate(0.5);
-    flutterTts.setVolume(1.0);
-    flutterTts.setPitch(1.0);
+    await flutterTts.setSpeechRate(0.5);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setPitch(1.0);
   }
 
   @override
@@ -59,10 +60,116 @@ class _CommunicationState extends State<Communication> {
     }
   }
 
-  void _addNewCard(String label, IconData icon, Color color) {
-    setState(() {
-      widget.buttons.insert(0, Cards(label, color, icon)); // Adiciona o novo card na primeira posição
-    });
+  void _showEditCardDialog(Cards card) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String label = card.label;
+        IconData selectedIcon = card.icon;
+        Color selectedColor = card.color;
+        final List<IconData> icons = [
+          Icons.person,
+          Icons.home,
+          Icons.favorite,
+          Icons.thumb_up,
+          Icons.star,
+          Icons.cake,
+          Icons.access_alarm,
+        ];
+        final List<Color> colors = [
+          Colors.white,
+          Colors.red,
+          Colors.blue,
+          Colors.green,
+          Colors.yellow,
+          Colors.orange,
+          Colors.purple,
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Editar Card"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (value) => label = value,
+                    decoration: const InputDecoration(labelText: "Palavra"),
+                    controller: TextEditingController(text: label),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text("Selecione um Ícone"),
+                  Wrap(
+                    spacing: 8,
+                    children: icons.map((icon) {
+                      return GestureDetector(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedIcon = icon;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: selectedIcon == icon ? Colors.grey[300] : null,
+                          ),
+                          child: Icon(icon, color: Colors.black),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text("Selecione uma Cor"),
+                  Wrap(
+                    spacing: 8,
+                    children: colors.map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          setDialogState(() {
+                            selectedColor = color;
+                          });
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selectedColor == color ? Colors.black : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      card.label = label;
+                      card.icon = selectedIcon;
+                      card.color = selectedColor;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Salvar"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -75,13 +182,10 @@ class _CommunicationState extends State<Communication> {
     return Column(
       children: [
         Container(
-          key: _parentContainerKey,
-          width: double.infinity,
           padding: const EdgeInsets.all(8.0),
           color: const Color.fromARGB(255, 182, 182, 182),
           child: Row(
             children: [
-              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: _speakContainerContent,
                 style: ElevatedButton.styleFrom(
@@ -131,12 +235,11 @@ class _CommunicationState extends State<Communication> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Column(
+                child: const Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.backspace, color: Color(0xFF4C4C4C), size: 24),
-                    const SizedBox(height: 4),
-                    const Text("Apagar", style: TextStyle(color: Colors.black)),
+                    Icon(Icons.backspace, color: Colors.black),
+                    Text("Apagar", style: TextStyle(color: Colors.black)),
                   ],
                 ),
               ),
@@ -165,12 +268,12 @@ class _CommunicationState extends State<Communication> {
                           children: [
                             ListTile(
                               leading: const Icon(Icons.settings),
-                              title: const Text("Settings"),
+                              title: const Text("Configurações"),
                               onTap: widget.toggleMenu,
                             ),
                             ListTile(
                               leading: const Icon(Icons.info),
-                              title: const Text("About"),
+                              title: const Text("Sobre"),
                               onTap: widget.toggleMenu,
                             ),
                           ],
@@ -181,32 +284,52 @@ class _CommunicationState extends State<Communication> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: ReorderableGridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                    ),
-                    itemCount: widget.buttons.length,
-                    itemBuilder: (context, index) {
-                      final card = widget.buttons[index];
-                      return CardsWidget(
-                        key: ValueKey(card),
-                        button: card,
-                        iconSize: cardWidth * 0.4,
-                        fontSize: cardWidth * 0.15,
-                        onTap: () {
-                          widget.addWord(card.label);
-                        },
-                      );
-                    },
-                    onReorder: (oldIndex, newIndex) {
-                      setState(() {
-                        final card = widget.buttons.removeAt(oldIndex);
-                        widget.buttons.insert(newIndex, card); // Reordena livremente
-                      });
-                    },
-                  ),
+                  child: widget.isEditMode
+                      ? ReorderableGridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 20,
+                            crossAxisSpacing: 20,
+                          ),
+                          itemCount: widget.buttons.length,
+                          itemBuilder: (context, index) {
+                            final card = widget.buttons[index];
+                            return CardsWidget(
+                              key: ValueKey(card),
+                              button: card,
+                              iconSize: cardWidth * 0.35,
+                              fontSize: cardWidth * 0.12,
+                              onTap: () {
+                                _showEditCardDialog(card);
+                              },
+                            );
+                          },
+                          onReorder: (oldIndex, newIndex) {
+                            setState(() {
+                              final card = widget.buttons.removeAt(oldIndex);
+                              widget.buttons.insert(newIndex, card);
+                            });
+                          },
+                        )
+                      : GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            mainAxisSpacing: 20,
+                            crossAxisSpacing: 20,
+                          ),
+                          itemCount: widget.buttons.length,
+                          itemBuilder: (context, index) {
+                            final card = widget.buttons[index];
+                            return CardsWidget(
+                              button: card,
+                              iconSize: cardWidth * 0.4,
+                              fontSize: cardWidth * 0.15,
+                              onTap: () {
+                                widget.addWord(card.label);
+                              },
+                            );
+                          },
+                        ),
                 ),
               ),
             ],
