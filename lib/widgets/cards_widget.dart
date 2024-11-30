@@ -4,14 +4,14 @@ import '../models/cards.dart';
 class CardsWidget extends StatelessWidget {
   final Cards button;
   final VoidCallback onTap;
-  final double fontSize; 
-  final double iconSize; 
+  final double fontSize;
+  final double pictogramSize;
 
   CardsWidget({
     Key? key,
     required this.button,
     required this.onTap,
-    required this.iconSize,
+    required this.pictogramSize,
     required this.fontSize,
   }) : super(key: key);
 
@@ -27,10 +27,12 @@ class CardsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              button.icon,
-              size: iconSize, 
-              color: Colors.black,
+            // Substituindo o ícone pela imagem do pictograma
+            Image.asset(
+              button.pictogram,
+              width: pictogramSize,
+              height: pictogramSize,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 5),
             Text(

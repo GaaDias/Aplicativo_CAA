@@ -11,6 +11,7 @@ class Communication extends StatefulWidget {
   final Function addWord;
   final VoidCallback clearWords;
   final VoidCallback addNewCard;
+  final Function(Cards card) editCard; // Nova função para edição de cards
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
   final bool isEditMode;
@@ -22,6 +23,7 @@ class Communication extends StatefulWidget {
     required this.addWord,
     required this.clearWords,
     required this.addNewCard,
+    required this.editCard,
     required this.isMenuVisible,
     required this.toggleMenu,
     required this.isEditMode,
@@ -62,126 +64,13 @@ class _CommunicationState extends State<Communication> {
     }
   }
 
-  void _showEditCardDialog(Cards card) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String label = card.label;
-        IconData selectedIcon = card.icon;
-        Color selectedColor = card.color;
-        final List<IconData> icons = [
-          Icons.person,
-          Icons.home,
-          Icons.favorite,
-          Icons.thumb_up,
-          Icons.star,
-          Icons.cake,
-          Icons.access_alarm,
-        ];
-        final List<Color> colors = [
-          Colors.white,
-          Colors.red,
-          Colors.blue,
-          Colors.green,
-          Colors.yellow,
-          Colors.orange,
-          Colors.purple,
-        ];
-
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text("Editar Card"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (value) => label = value,
-                    decoration: const InputDecoration(labelText: "Palavra"),
-                    controller: TextEditingController(text: label),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text("Selecione um Ícone"),
-                  Wrap(
-                    spacing: 8,
-                    children: icons.map((icon) {
-                      return GestureDetector(
-                        onTap: () {
-                          setDialogState(() {
-                            selectedIcon = icon;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: selectedIcon == icon ? Colors.grey[300] : null,
-                          ),
-                          child: Icon(icon, color: Colors.black),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text("Selecione uma Cor"),
-                  Wrap(
-                    spacing: 8,
-                    children: colors.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setDialogState(() {
-                            selectedColor = color;
-                          });
-                        },
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: selectedColor == color ? Colors.black : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      card.label = label;
-                      card.icon = selectedIcon;
-                      card.color = selectedColor;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Salvar"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final int crossAxisCount = widget.columns; // Número de colunas ajustável pelo usuário
+    final int crossAxisCount = widget.columns; 
     final double screenWidth = MediaQuery.of(context).size.width;
     final double cardWidth = (screenWidth - 32) / (crossAxisCount + 0.5);
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
     final double cardSpacing = (screenWidth - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
-
 
     return Column(
       children: [
@@ -286,58 +175,69 @@ class _CommunicationState extends State<Communication> {
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: widget.isEditMode
-                      ? ReorderableGridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: cardSpacing, // Espaçamento horizontal automático
-                            mainAxisSpacing: cardSpacing, // Espaçamento vertical automático
-                            childAspectRatio: 1, // Proporção largura/altura dos cards
-                          ),
-                          itemCount: widget.buttons.length,
-                          itemBuilder: (context, index) {
-                            final card = widget.buttons[index];
-                            return CardsWidget(
-                              key: ValueKey(card),
-                              button: card,
-                              iconSize: cardWidth * 0.35,
-                              fontSize: cardWidth * 0.2,
-                              onTap: () {
-                                _showEditCardDialog(card);
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableWidth = constraints.maxWidth; // Largura disponível
+                    final pictogramScale = widget.isMenuVisible ? 0.7 : 1.0; // Fator de escala
+                    final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5); // 32 * 2 para padding lateral
+                    final cardSpacing = (availableWidth - 64 - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
+              
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Espaçamento lateral
+                      child: widget.isEditMode
+                          ? ReorderableGridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: cardSpacing,
+                                mainAxisSpacing: cardSpacing,
+                                childAspectRatio: 1,
+                              ),
+                              itemCount: widget.buttons.length,
+                              itemBuilder: (context, index) {
+                                final card = widget.buttons[index];
+                                return CardsWidget(
+                                  key: ValueKey(card),
+                                  button: card,
+                                  pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
+                                  fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
+                                  onTap: () {
+                                    widget.editCard(card);
+                                  },
+                                );
                               },
-                            );
-                          },
-                          onReorder: (oldIndex, newIndex) {
-                            setState(() {
-                              final card = widget.buttons.removeAt(oldIndex);
-                              widget.buttons.insert(newIndex, card);
-                            });
-                          },
-                        )
-                      : GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: cardSpacing, // Espaçamento horizontal automático
-                            mainAxisSpacing: cardSpacing, // Espaçamento vertical automático
-                            childAspectRatio: 1, // Proporção largura/altura dos cards
-                          ),
-                          itemCount: widget.buttons.length,
-                          itemBuilder: (context, index) {
-                            final card = widget.buttons[index];
-                            return CardsWidget(
-                              button: card,
-                              iconSize: cardWidth * 0.35,
-                              fontSize: cardWidth * 0.2,
-                              onTap: () {
-                                widget.addWord(card.label);
+                              onReorder: (oldIndex, newIndex) {
+                                setState(() {
+                                  final card = widget.buttons.removeAt(oldIndex);
+                                  widget.buttons.insert(newIndex, card);
+                                });
                               },
-                            );
-                          },
-                        ),
+                            )
+                          : GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: cardSpacing,
+                                mainAxisSpacing: cardSpacing,
+                                childAspectRatio: 1,
+                              ),
+                              itemCount: widget.buttons.length,
+                              itemBuilder: (context, index) {
+                                final card = widget.buttons[index];
+                                return CardsWidget(
+                                  key: ValueKey(card),
+                                  button: card,
+                                  pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
+                                  fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
+                                  onTap: () {
+                                    widget.addWord(card.label);
+                                  },
+                                );
+                              },
+                            ),
+                    );
+                  },
                 ),
               ),
+
             ],
           ),
         ),
