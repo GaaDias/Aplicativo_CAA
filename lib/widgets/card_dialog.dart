@@ -6,14 +6,14 @@ class CardDialog extends StatefulWidget {
   final bool isEditMode;
   final Cards? card;
   final void Function(String label, String pictogram, Color color)? onSave;
-  final VoidCallback? onDelete; // Callback para exclusão do card
+  final VoidCallback? onDelete;
 
   const CardDialog({
     Key? key,
     required this.isEditMode,
     this.card,
     this.onSave,
-    this.onDelete, // Adicionado para exclusão
+    this.onDelete,
   }) : super(key: key);
 
   @override
@@ -34,10 +34,9 @@ class _CardDialogState extends State<CardDialog> {
   }
 
   void _updatePictogram(String input) {
-    // Busca o pictograma relacionado à palavra digitada
     String? newPictogram = PictogramDatabase.getPictogramByKeyword(input);
     setState(() {
-      selectedPictogram = newPictogram ?? ""; // Atribui vazio se não encontrar
+      selectedPictogram = newPictogram ?? "";
     });
   }
 
@@ -77,7 +76,6 @@ class _CardDialogState extends State<CardDialog> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Coluna da imagem
                 Expanded(
                   child: Column(
                     children: [
@@ -125,7 +123,6 @@ class _CardDialogState extends State<CardDialog> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                // Coluna da palavra
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,43 +200,52 @@ class _CardDialogState extends State<CardDialog> {
           ],
         ),
       ),
+      actionsPadding: const EdgeInsets.symmetric(vertical: 16),
+      actionsAlignment: MainAxisAlignment.center,
       actions: [
-        if (widget.isEditMode)
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: 'Excluir Card',
-            onPressed: () {
-              if (widget.onDelete != null) {
-                widget.onDelete!(); // Chama a exclusão do card
-              }
-            },
-          ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            "Cancelar",
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (label.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("O campo 'Palavra' não pode estar vazio!"),
-                ),
-              );
-              return;
-            }
-            widget.onSave?.call(label, selectedPictogram, selectedColor);
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            "Salvar",
-            style: TextStyle(color: Colors.black),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (widget.isEditMode)
+              IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: 'Excluir Card',
+                onPressed: () {
+                  if (widget.onDelete != null) {
+                    widget.onDelete!();
+                  }
+                },
+              ),
+            const SizedBox(width: 20), 
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (label.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("O campo 'Palavra' não pode estar vazio!"),
+                    ),
+                  );
+                  return;
+                }
+                widget.onSave?.call(label, selectedPictogram, selectedColor);
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Salvar",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
         ),
       ],
     );

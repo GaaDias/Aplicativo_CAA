@@ -176,7 +176,7 @@ class _CommunicationState extends State<Communication> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final availableWidth = constraints.maxWidth; // Largura disponível
-                    final pictogramScale = widget.isMenuVisible ? 0.7 : 1.0; // Fator de escala
+                    final pictogramScale = widget.isMenuVisible ? 0.95 : 1.0; // Fator de escala
                     final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5); // 32 * 2 para padding lateral
                     final cardSpacing = (availableWidth - 64 - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
               
