@@ -68,9 +68,7 @@ class _CommunicationState extends State<Communication> {
   Widget build(BuildContext context) {
     final int crossAxisCount = widget.columns; 
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardWidth = (screenWidth - 32) / (crossAxisCount + 0.5);
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
-    final double cardSpacing = (screenWidth - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
 
     return Column(
       children: [
@@ -201,7 +199,11 @@ class _CommunicationState extends State<Communication> {
                                   pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
                                   fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
                                   onTap: () {
-                                    widget.editCard(card);
+                                    if (widget.isEditMode) {
+                                      widget.editCard(card); // Chama a edição do card
+                                    } else {
+                                      widget.addWord(card.label); // Adiciona a palavra ao container se não estiver no modo de edição
+                                    }
                                   },
                                 );
                               },
@@ -228,7 +230,11 @@ class _CommunicationState extends State<Communication> {
                                   pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
                                   fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
                                   onTap: () {
-                                    widget.addWord(card.label);
+                                    if (widget.isEditMode) {
+                                      widget.editCard(card); // Chama a edição do card
+                                    } else {
+                                      widget.addWord(card.label); // Adiciona a palavra ao container se não estiver no modo de edição
+                                    }
                                   },
                                 );
                               },

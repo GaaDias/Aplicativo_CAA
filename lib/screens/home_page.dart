@@ -56,8 +56,31 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _editCard(Cards card) {
-    _showCardDialog(isEditMode: true, card: card);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CardDialog(
+          isEditMode: true,
+          card: card,
+          onSave: (label, pictogram, color) {
+            setState(() {
+              card.label = label;
+              card.pictogram = pictogram;
+              card.color = color;
+            });
+          },
+          onDelete: () {
+            setState(() {
+              buttons.remove(card); // Atualiza a lista ao excluir o card
+            });
+            Navigator.of(context).pop(); // Fecha o pop-up após excluir
+          },
+        );
+      },
+    );
   }
+
+
 
   void _onColumnsChanged(int newColumns) {
     setState(() {

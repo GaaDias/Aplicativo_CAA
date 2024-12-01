@@ -6,12 +6,14 @@ class CardDialog extends StatefulWidget {
   final bool isEditMode;
   final Cards? card;
   final void Function(String label, String pictogram, Color color)? onSave;
+  final VoidCallback? onDelete; // Callback para exclusão do card
 
   const CardDialog({
     Key? key,
     required this.isEditMode,
     this.card,
     this.onSave,
+    this.onDelete, // Adicionado para exclusão
   }) : super(key: key);
 
   @override
@@ -27,8 +29,8 @@ class _CardDialogState extends State<CardDialog> {
   void initState() {
     super.initState();
     label = widget.card?.label ?? "";
-    selectedPictogram = widget.card?.pictogram ?? ""; // Inicia vazio
-    selectedColor = widget.card?.color ?? Colors.blue; // Cor padrão
+    selectedPictogram = widget.card?.pictogram ?? "";
+    selectedColor = widget.card?.color ?? Colors.blue;
   }
 
   void _updatePictogram(String input) {
@@ -122,9 +124,9 @@ class _CardDialogState extends State<CardDialog> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(width: 20),
                 // Coluna da palavra
-                Expanded( 
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -139,11 +141,12 @@ class _CardDialogState extends State<CardDialog> {
                       const SizedBox(height: 8),
                       TextField(
                         onChanged: (value) {
-                          label = value; // Armazena o valor digitado.
+                          label = value;
                         },
                         onSubmitted: (value) {
                           setState(() {
-                              selectedPictogram = PictogramDatabase.getPictogramByKeyword(value)!;
+                            selectedPictogram = PictogramDatabase
+                                .getPictogramByKeyword(value)!;
                           });
                         },
                         decoration: const InputDecoration(
@@ -197,47 +200,53 @@ class _CardDialogState extends State<CardDialog> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    "Cancelar",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    if (label.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("O campo 'Palavra' não pode estar vazio!"),
-                        ),
-                      );
-                      return;
-                    }
-                    widget.onSave?.call(label, selectedPictogram, selectedColor);
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    "Salvar", 
-                    style: TextStyle(color: Colors.black)),
-                ),
-              ],
-            ),
           ],
         ),
       ),
+      actions: [
+        if (widget.isEditMode)
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: 'Excluir Card',
+            onPressed: () {
+              if (widget.onDelete != null) {
+                widget.onDelete!(); // Chama a exclusão do card
+              }
+            },
+          ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Cancelar",
+            style: TextStyle(color: Colors.black),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (label.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("O campo 'Palavra' não pode estar vazio!"),
+                ),
+              );
+              return;
+            }
+            widget.onSave?.call(label, selectedPictogram, selectedColor);
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Salvar",
+            style: TextStyle(color: Colors.black),
+          ),
+        ),
+      ],
     );
   }
 
   void _selectPictogram(BuildContext context) {
-    final pictograms = PictogramDatabase.getAllPictograms(); // Todos os pictogramas
+    final pictograms = PictogramDatabase.getAllPictograms();
 
     showDialog(
       context: context,
