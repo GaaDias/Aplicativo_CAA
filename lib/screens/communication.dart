@@ -6,7 +6,7 @@ import '../widgets/cards_widget.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class Communication extends StatefulWidget {
-  final List<Cards> buttons;
+  final List<Cards> cardsList;
   final List<String> selectedWords;
   final Function addWord;
   final VoidCallback clearWords;
@@ -18,7 +18,7 @@ class Communication extends StatefulWidget {
   final int columns;
 
   Communication({
-    required this.buttons,
+    required this.cardsList,
     required this.selectedWords,
     required this.addWord,
     required this.clearWords,
@@ -190,13 +190,13 @@ class _CommunicationState extends State<Communication> {
                               mainAxisSpacing: cardSpacing,
                               childAspectRatio: 1,
                             ),
-                            itemCount: widget.buttons.length,
+                            itemCount: widget.cardsList.length,
                             itemBuilder: (context, index) {
-                              final card = widget.buttons[index];
+                              final card = widget.cardsList[index];
 
                               return Opacity(
-                                key: ValueKey(card.id), // Baseado no identificador único
-                                opacity: card.isActive ? 1.0 : 0.3, // Opacidade menor para cards inativos
+                                key: ValueKey(card.id), 
+                                opacity: card.isActive ? 1.0 : 0.3, 
                                 child: CardsWidget(
                                   button: card,
                                   pictogramSize: cardWidth * 0.5,
@@ -213,8 +213,8 @@ class _CommunicationState extends State<Communication> {
                             },
                             onReorder: (oldIndex, newIndex) {
                               setState(() {
-                                final card = widget.buttons.removeAt(oldIndex);
-                                widget.buttons.insert(newIndex, card);
+                                final card = widget.cardsList.removeAt(oldIndex);
+                                widget.cardsList.insert(newIndex, card);
                               });
                             },
                           )
@@ -225,9 +225,9 @@ class _CommunicationState extends State<Communication> {
                               mainAxisSpacing: cardSpacing,
                               childAspectRatio: 1,
                             ),
-                            itemCount: widget.buttons.where((card) => card.isActive).length, // Somente cards ativos
+                            itemCount: widget.cardsList.where((card) => card.isActive).length, 
                             itemBuilder: (context, index) {
-                              final card = widget.buttons.where((card) => card.isActive).toList()[index];
+                              final card = widget.cardsList.where((card) => card.isActive).toList()[index];
                               return CardsWidget(
                                 key: ValueKey(card),
                                 button: card,

@@ -40,7 +40,7 @@ class PictogramDatabase {
         return entry.key;
       }
     }
-    return null; // Caso nenhuma palavra-chave corresponda.
+    return null; 
   }
 
   static List<String> getAllPictogramsForKeyword(String keyword) {

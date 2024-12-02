@@ -24,7 +24,7 @@ class _CardDialogState extends State<CardDialog> {
   late String label;
   late String selectedPictogram;
   late Color selectedColor;
-  late bool isActive; // Armazena o estado do switch
+  late bool isActive; 
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class _CardDialogState extends State<CardDialog> {
     label = widget.card?.label ?? "";
     selectedPictogram = widget.card?.pictogram ?? "";
     selectedColor = widget.card?.color ?? Colors.blue;
-    isActive = widget.card?.isActive ?? true; // Inicializa o estado do switch
+    isActive = widget.card?.isActive ?? true; 
   }
 
 
@@ -113,7 +113,7 @@ class _CardDialogState extends State<CardDialog> {
                 value: isActive, 
                 onChanged: (value) {
                   setState(() {
-                    isActive = value; // Atualiza o estado do switch
+                    isActive = value; 
                   });
                 },
               ),

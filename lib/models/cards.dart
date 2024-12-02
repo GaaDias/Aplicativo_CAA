@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class Cards {
-  final String id; // Identificador único
+  final String id;
   String label;
   Color color;
   String pictogram;
   bool isActive;
 
   Cards(this.label, this.color, this.pictogram, {this.isActive = true})
-      : id = const Uuid().v4(); // Gera um ID único ao criar o card
+      : id = const Uuid().v4(); 
 
   @override
   bool operator ==(Object other) =>

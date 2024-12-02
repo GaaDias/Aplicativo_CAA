@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Cards> buttons = [];
+  List<Cards> cardsList = [];
   List<String> selectedWords = [];
   int _selectedIndex = 0;
   bool _isMenuVisible = false;
@@ -80,9 +80,9 @@ class _HomePageState extends State<HomePage> {
           },
           onDelete: () {
             setState(() {
-              buttons.remove(card); // Remove o card
+              cardsList.remove(card); 
             });
-            Navigator.of(context).pop(); // Fecha o diálogo
+            Navigator.of(context).pop(); 
           },
         );
       },
@@ -116,10 +116,9 @@ class _HomePageState extends State<HomePage> {
                   _reorganizeCards();
                 }
               } else {
-                // Cria um novo card
                 final newCard = Cards(label, color, pictogram, isActive: isActive);
-                buttons.add(newCard); // Adiciona o card na última posição
-                _reorganizeCards(); // Reorganiza para garantir que os inativos fiquem no final
+                cardsList.add(newCard); 
+                _reorganizeCards(); 
               }
             });
           },
@@ -130,11 +129,11 @@ class _HomePageState extends State<HomePage> {
 
   /// Reorganiza os cards para que os inativos estejam sempre no final
   void _reorganizeCards() {
-    final activeCards = buttons.where((card) => card.isActive).toList();
-    final inactiveCards = buttons.where((card) => !card.isActive).toList();
+    final activeCards = cardsList.where((card) => card.isActive).toList();
+    final inactiveCards = cardsList.where((card) => !card.isActive).toList();
 
     setState(() {
-      buttons = [...activeCards, ...inactiveCards]; // Reorganiza a lista
+      cardsList = [...activeCards, ...inactiveCards];
     });
   }
 
@@ -227,7 +226,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _selectedIndex == 0
           ? Communication(
-              buttons: buttons,
+              cardsList: cardsList,
               selectedWords: selectedWords,
               addWord: addWord,
               clearWords: clearWords,

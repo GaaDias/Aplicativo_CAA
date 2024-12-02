@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Settings extends StatelessWidget {
-  final int currentColumns; // Número atual de colunas
-  final Function(int) onColumnsChanged; // Callback para atualizar o número de colunas
+  final int currentColumns; 
+  final Function(int) onColumnsChanged; 
 
   Settings({
     required this.currentColumns,
@@ -40,7 +40,7 @@ class Settings extends StatelessWidget {
             onPressed: () {
               final int? newColumns = int.tryParse(_controller.text);
               if (newColumns != null && newColumns > 0) {
-                onColumnsChanged(newColumns); // Atualiza o número de colunas
+                onColumnsChanged(newColumns); 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Número de colunas atualizado para $newColumns!'),
