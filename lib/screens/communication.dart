@@ -11,7 +11,7 @@ class Communication extends StatefulWidget {
   final Function addWord;
   final VoidCallback clearWords;
   final VoidCallback addNewCard;
-  final Function(Cards card) editCard; // Nova função para edição de cards
+  final Function(Cards card) editCard; 
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
   final bool isEditMode;
@@ -175,13 +175,13 @@ class _CommunicationState extends State<Communication> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final availableWidth = constraints.maxWidth; // Largura disponível
-                    final pictogramScale = widget.isMenuVisible ? 0.95 : 1.0; // Fator de escala
-                    final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5); // 32 * 2 para padding lateral
+                    final availableWidth = constraints.maxWidth; 
+                    final pictogramScale = widget.isMenuVisible ? 0.95 : 1.0; 
+                    final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5); 
                     final cardSpacing = (availableWidth - 64 - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
               
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Espaçamento lateral
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0), 
                       child: widget.isEditMode
                           ? ReorderableGridView.builder(
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -196,13 +196,13 @@ class _CommunicationState extends State<Communication> {
                                 return CardsWidget(
                                   key: ValueKey(card),
                                   button: card,
-                                  pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
-                                  fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
+                                  pictogramSize: cardWidth * 0.5 * pictogramScale, 
+                                  fontSize: cardWidth * 0.2 * pictogramScale,      
                                   onTap: () {
                                     if (widget.isEditMode) {
-                                      widget.editCard(card); // Chama a edição do card
+                                      widget.editCard(card); 
                                     } else {
-                                      widget.addWord(card.label); // Adiciona a palavra ao container se não estiver no modo de edição
+                                      widget.addWord(card.label);
                                     }
                                   },
                                 );
@@ -227,13 +227,13 @@ class _CommunicationState extends State<Communication> {
                                 return CardsWidget(
                                   key: ValueKey(card),
                                   button: card,
-                                  pictogramSize: cardWidth * 0.5 * pictogramScale, // Ajuste dinâmico
-                                  fontSize: cardWidth * 0.2 * pictogramScale,      // Ajuste dinâmico
+                                  pictogramSize: cardWidth * 0.5 * pictogramScale, 
+                                  fontSize: cardWidth * 0.2 * pictogramScale,      
                                   onTap: () {
                                     if (widget.isEditMode) {
-                                      widget.editCard(card); // Chama a edição do card
+                                      widget.editCard(card); 
                                     } else {
-                                      widget.addWord(card.label); // Adiciona a palavra ao container se não estiver no modo de edição
+                                      widget.addWord(card.label); 
                                     }
                                   },
                                 );

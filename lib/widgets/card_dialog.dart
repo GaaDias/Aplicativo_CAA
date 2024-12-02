@@ -33,42 +33,90 @@ class _CardDialogState extends State<CardDialog> {
     selectedColor = widget.card?.color ?? Colors.blue;
   }
 
-  void _updatePictogram(String input) {
-    String? newPictogram = PictogramDatabase.getPictogramByKeyword(input);
-    setState(() {
-      selectedPictogram = newPictogram ?? "";
-    });
+  void _confirmDeletion() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Confirmação"),
+          content: const Text("Tem certeza de que deseja excluir este card?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+              },
+              child: const Text(
+                "Cancelar", 
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (widget.onDelete != null) {
+                  widget.onDelete!();
+                }
+                Navigator.of(context).pop(); 
+              },
+              child: const Text(
+                "Excluir",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
     final colors = [
-      Colors.green,
-      Colors.orange,
       Colors.red,
+      Colors.orange,
       Colors.yellow,
-      Colors.blue,
+      const Color.fromARGB(255, 0, 255, 8),
+      Colors.teal,
+      const Color.fromARGB(255, 16, 31, 241),
       Colors.lightBlue,
       Colors.purple,
       Colors.pink,
       Colors.brown,
-      Colors.teal,
     ];
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: Center(
-        child: Text(
-          widget.isEditMode ? "Edição de Card" : "Criação de Card",
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+      title: Stack(
+        alignment: Alignment.center,
+        children: [
+          Center(
+            child: Text(
+              widget.isEditMode ? "Edição de Card" : "Criação de Card",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
+          Positioned(
+            right: 0, // Alinha o SwitchButton ao final
+            child: Transform.scale(
+              scale: 0.8, // Reduz o tamanho do Switch
+              child: Switch(
+                value: false, // Valor inicial
+                onChanged: (value) {
+                  // Sem lógica ainda
+                },
+              ),
+            ),
+          ),
+        ],
       ),
+
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -211,9 +259,7 @@ class _CardDialogState extends State<CardDialog> {
                 icon: const Icon(Icons.delete),
                 tooltip: 'Excluir Card',
                 onPressed: () {
-                  if (widget.onDelete != null) {
-                    widget.onDelete!();
-                  }
+                  _confirmDeletion();
                 },
               ),
             const SizedBox(width: 20), 

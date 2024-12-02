@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool _isMenuVisible = false;
   bool _isEditMode = false;
-  int _columns = 5;
+  int _columns = 7;
 
   void addWord(String word) {
     setState(() {
@@ -26,9 +26,12 @@ class _HomePageState extends State<HomePage> {
 
   void clearWords() {
     setState(() {
-      selectedWords.clear();
+      if (selectedWords.isNotEmpty) {
+        selectedWords.removeLast();
+      }
     });
   }
+
 
   void _toggleMenu() {
     setState(() {
@@ -71,9 +74,9 @@ class _HomePageState extends State<HomePage> {
           },
           onDelete: () {
             setState(() {
-              buttons.remove(card); // Atualiza a lista ao excluir o card
+              buttons.remove(card); 
             });
-            Navigator.of(context).pop(); // Fecha o pop-up após excluir
+            Navigator.of(context).pop(); 
           },
         );
       },
@@ -99,10 +102,10 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             if (isEditMode && card != null) {
               card.label = label;
-              card.pictogram = pictogram; // Atualizado para "pictogram"
+              card.pictogram = pictogram; 
               card.color = color;
             } else {
-              buttons.add(Cards(label, color, pictogram)); // Adiciona novo card com pictograma
+              buttons.add(Cards(label, color, pictogram)); 
             }
           });
         },

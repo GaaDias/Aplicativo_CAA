@@ -27,7 +27,6 @@ class CardsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Substituindo o ícone pela imagem do pictograma
             Image.asset(
               button.pictogram,
               width: pictogramSize,
