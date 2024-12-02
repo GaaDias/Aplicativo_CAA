@@ -5,7 +5,7 @@ import '../data/pictogram_database.dart';
 class CardDialog extends StatefulWidget {
   final bool isEditMode;
   final Cards? card;
-  final void Function(String label, String pictogram, Color color)? onSave;
+  final void Function(String label, String pictogram, Color color, bool isActive)? onSave;
   final VoidCallback? onDelete;
 
   const CardDialog({
@@ -24,6 +24,7 @@ class _CardDialogState extends State<CardDialog> {
   late String label;
   late String selectedPictogram;
   late Color selectedColor;
+  late bool isActive; // Armazena o estado do switch
 
   @override
   void initState() {
@@ -31,7 +32,9 @@ class _CardDialogState extends State<CardDialog> {
     label = widget.card?.label ?? "";
     selectedPictogram = widget.card?.pictogram ?? "";
     selectedColor = widget.card?.color ?? Colors.blue;
+    isActive = widget.card?.isActive ?? true; // Inicializa o estado do switch
   }
+
 
   void _confirmDeletion() {
     showDialog(
@@ -103,13 +106,15 @@ class _CardDialogState extends State<CardDialog> {
             ),
           ),
           Positioned(
-            right: 0, // Alinha o SwitchButton ao final
+            right: 0, 
             child: Transform.scale(
-              scale: 0.8, // Reduz o tamanho do Switch
+              scale: 0.8, 
               child: Switch(
-                value: false, // Valor inicial
+                value: isActive, 
                 onChanged: (value) {
-                  // Sem lógica ainda
+                  setState(() {
+                    isActive = value; // Atualiza o estado do switch
+                  });
                 },
               ),
             ),
@@ -283,7 +288,7 @@ class _CardDialogState extends State<CardDialog> {
                   );
                   return;
                 }
-                widget.onSave?.call(label, selectedPictogram, selectedColor);
+                widget.onSave?.call(label, selectedPictogram, selectedColor, isActive);
                 Navigator.of(context).pop();
               },
               child: const Text(

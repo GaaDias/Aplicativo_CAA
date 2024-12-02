@@ -183,62 +183,67 @@ class _CommunicationState extends State<Communication> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0), 
                       child: widget.isEditMode
-                          ? ReorderableGridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: cardSpacing,
-                                mainAxisSpacing: cardSpacing,
-                                childAspectRatio: 1,
-                              ),
-                              itemCount: widget.buttons.length,
-                              itemBuilder: (context, index) {
-                                final card = widget.buttons[index];
-                                return CardsWidget(
-                                  key: ValueKey(card),
+                        ? ReorderableGridView.builder(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: cardSpacing,
+                              mainAxisSpacing: cardSpacing,
+                              childAspectRatio: 1,
+                            ),
+                            itemCount: widget.buttons.length,
+                            itemBuilder: (context, index) {
+                              final card = widget.buttons[index];
+
+                              return Opacity(
+                                key: ValueKey(card.id), // Baseado no identificador único
+                                opacity: card.isActive ? 1.0 : 0.3, // Opacidade menor para cards inativos
+                                child: CardsWidget(
                                   button: card,
-                                  pictogramSize: cardWidth * 0.5 * pictogramScale, 
-                                  fontSize: cardWidth * 0.2 * pictogramScale,      
+                                  pictogramSize: cardWidth * 0.5,
+                                  fontSize: cardWidth * 0.2,
                                   onTap: () {
                                     if (widget.isEditMode) {
-                                      widget.editCard(card); 
-                                    } else {
+                                      widget.editCard(card);
+                                    } else if (card.isActive) {
                                       widget.addWord(card.label);
                                     }
                                   },
-                                );
-                              },
-                              onReorder: (oldIndex, newIndex) {
-                                setState(() {
-                                  final card = widget.buttons.removeAt(oldIndex);
-                                  widget.buttons.insert(newIndex, card);
-                                });
-                              },
-                            )
-                          : GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: cardSpacing,
-                                mainAxisSpacing: cardSpacing,
-                                childAspectRatio: 1,
-                              ),
-                              itemCount: widget.buttons.length,
-                              itemBuilder: (context, index) {
-                                final card = widget.buttons[index];
-                                return CardsWidget(
-                                  key: ValueKey(card),
-                                  button: card,
-                                  pictogramSize: cardWidth * 0.5 * pictogramScale, 
-                                  fontSize: cardWidth * 0.2 * pictogramScale,      
-                                  onTap: () {
-                                    if (widget.isEditMode) {
-                                      widget.editCard(card); 
-                                    } else {
-                                      widget.addWord(card.label); 
-                                    }
-                                  },
-                                );
-                              },
+                                ),
+                              );
+                            },
+                            onReorder: (oldIndex, newIndex) {
+                              setState(() {
+                                final card = widget.buttons.removeAt(oldIndex);
+                                widget.buttons.insert(newIndex, card);
+                              });
+                            },
+                          )
+                        : GridView.builder(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: cardSpacing,
+                              mainAxisSpacing: cardSpacing,
+                              childAspectRatio: 1,
                             ),
+                            itemCount: widget.buttons.where((card) => card.isActive).length, // Somente cards ativos
+                            itemBuilder: (context, index) {
+                              final card = widget.buttons.where((card) => card.isActive).toList()[index];
+                              return CardsWidget(
+                                key: ValueKey(card),
+                                button: card,
+                                pictogramSize: cardWidth * 0.5 * pictogramScale,
+                                fontSize: cardWidth * 0.2 * pictogramScale,
+                                onTap: () {
+                                  if (widget.isEditMode) {
+                                    widget.editCard(card); 
+                                  } else {
+                                    widget.addWord(card.label); 
+                                  }
+                                },
+                              );
+                            },
+                          ),
+
                     );
                   },
                 ),

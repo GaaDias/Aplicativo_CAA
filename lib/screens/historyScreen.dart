@@ -57,7 +57,7 @@ class HistoryScreen extends StatelessWidget {
                     subtitle: Text("Criado em: ${formatDate(item["timestamp"])}"),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      // Aqui você pode implementar ações, como visualizar mais detalhes ou opções de edição
+
                     },
                   ),
                 );

@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   void _toggleMenu() {
     setState(() {
       _isMenuVisible = !_isMenuVisible;
@@ -65,25 +64,30 @@ class _HomePageState extends State<HomePage> {
         return CardDialog(
           isEditMode: true,
           card: card,
-          onSave: (label, pictogram, color) {
+          onSave: (label, pictogram, color, isActive) {
             setState(() {
+              // Atualiza os atributos do card existente
               card.label = label;
               card.pictogram = pictogram;
               card.color = color;
+
+              // Reorganiza os cards se o estado ativo/inativo mudar
+              if (card.isActive != isActive) {
+                card.isActive = isActive;
+                _reorganizeCards();
+              }
             });
           },
           onDelete: () {
             setState(() {
-              buttons.remove(card); 
+              buttons.remove(card); // Remove o card
             });
-            Navigator.of(context).pop(); 
+            Navigator.of(context).pop(); // Fecha o diálogo
           },
         );
       },
     );
   }
-
-
 
   void _onColumnsChanged(int newColumns) {
     setState(() {
@@ -92,27 +96,47 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showCardDialog({required bool isEditMode, Cards? card}) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return CardDialog(
-        isEditMode: isEditMode,
-        card: card,
-        onSave: (label, pictogram, color) {
-          setState(() {
-            if (isEditMode && card != null) {
-              card.label = label;
-              card.pictogram = pictogram; 
-              card.color = color;
-            } else {
-              buttons.add(Cards(label, color, pictogram)); 
-            }
-          });
-        },
-      );
-    },
-  );
-}
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CardDialog(
+          isEditMode: isEditMode,
+          card: card,
+          onSave: (label, pictogram, color, isActive) {
+            setState(() {
+              if (isEditMode && card != null) {
+                // Atualiza os atributos do card existente
+                card.label = label;
+                card.pictogram = pictogram;
+                card.color = color;
+
+                // Reorganiza os cards se o estado ativo/inativo mudar
+                if (card.isActive != isActive) {
+                  card.isActive = isActive;
+                  _reorganizeCards();
+                }
+              } else {
+                // Cria um novo card
+                final newCard = Cards(label, color, pictogram, isActive: isActive);
+                buttons.add(newCard); // Adiciona o card na última posição
+                _reorganizeCards(); // Reorganiza para garantir que os inativos fiquem no final
+              }
+            });
+          },
+        );
+      },
+    );
+  }
+
+  /// Reorganiza os cards para que os inativos estejam sempre no final
+  void _reorganizeCards() {
+    final activeCards = buttons.where((card) => card.isActive).toList();
+    final inactiveCards = buttons.where((card) => !card.isActive).toList();
+
+    setState(() {
+      buttons = [...activeCards, ...inactiveCards]; // Reorganiza a lista
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

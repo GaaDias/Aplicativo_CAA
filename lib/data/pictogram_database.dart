@@ -4,7 +4,7 @@ class PictogramDatabase {
   static final Map<String, List<String>> _pictogramKeywords = {
     'assets/pictograms/abacaxi.png': ['abacaxi', 'fruta', 'alimento', 'comida'],
     'assets/pictograms/alface.png': ['alface', 'vegetal', 'salada', 'verdura', 'comida'],
-    'assets/pictograms/amendoas.png': ['amêndoas', 'nozes', 'castanha', 'snack', 'comida'],
+    'assets/pictograms/amendoas.png': ['amendoas', 'nozes', 'castanha', 'snack', 'comida'],
     'assets/pictograms/banheiro.png': ['banheiro', 'higiene', 'privada', 'toalete', 'sanitário'],
     'assets/pictograms/batatas_fritas.png': ['batatas fritas', 'batatas', 'snack', 'comida', 'fritas'],
     'assets/pictograms/beringela.png': ['beringela', 'vegetal', 'comida', 'verdura'],
@@ -34,7 +34,6 @@ class PictogramDatabase {
     'assets/pictograms/salsichas.png': ['salsichas', 'carne', 'comida', 'alimento'],
   };
 
-  /// Retorna o caminho do pictograma correspondente à palavra-chave.
   static String? getPictogramByKeyword(String keyword) {
     for (var entry in _pictogramKeywords.entries) {
       if (entry.value.contains(keyword.toLowerCase())) {
@@ -44,7 +43,6 @@ class PictogramDatabase {
     return null; // Caso nenhuma palavra-chave corresponda.
   }
 
-  /// Retorna todos os pictogramas associados à palavra-chave.
   static List<String> getAllPictogramsForKeyword(String keyword) {
     final entry = _pictogramKeywords.entries.firstWhere(
       (element) =>
@@ -54,7 +52,6 @@ class PictogramDatabase {
     return entry.key.isNotEmpty ? _pictogramKeywords[entry.key]! : [];
   }
 
-  /// Retorna todos os pictogramas do banco de dados.
   static List<String> getAllPictograms() {
     return UnmodifiableListView(
       _pictogramKeywords.keys.toList(),
