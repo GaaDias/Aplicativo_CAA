@@ -13,7 +13,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Cards> cardsList = [];
   List<String> selectedWords = [];
-  int _selectedIndex = 0;
   bool _isMenuVisible = false;
   bool _isEditMode = false;
   int _columns = 7;
@@ -38,17 +37,23 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   void _navigateToHistory() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => HistoryScreen(),
+      ),
+    );
+  }
+
+  void _navigateToSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Settings(
+          currentColumns: _columns,
+          onColumnsChanged: _onColumnsChanged,
+        ),
       ),
     );
   }
@@ -66,12 +71,10 @@ class _HomePageState extends State<HomePage> {
           card: card,
           onSave: (label, pictogram, color, isActive) {
             setState(() {
-              // Atualiza os atributos do card existente
               card.label = label;
               card.pictogram = pictogram;
               card.color = color;
 
-              // Reorganiza os cards se o estado ativo/inativo mudar
               if (card.isActive != isActive) {
                 card.isActive = isActive;
                 _reorganizeCards();
@@ -80,9 +83,9 @@ class _HomePageState extends State<HomePage> {
           },
           onDelete: () {
             setState(() {
-              cardsList.remove(card); 
+              cardsList.remove(card);
             });
-            Navigator.of(context).pop(); 
+            Navigator.of(context).pop();
           },
         );
       },
@@ -105,20 +108,19 @@ class _HomePageState extends State<HomePage> {
           onSave: (label, pictogram, color, isActive) {
             setState(() {
               if (isEditMode && card != null) {
-                // Atualiza os atributos do card existente
                 card.label = label;
                 card.pictogram = pictogram;
                 card.color = color;
 
-                // Reorganiza os cards se o estado ativo/inativo mudar
                 if (card.isActive != isActive) {
                   card.isActive = isActive;
                   _reorganizeCards();
                 }
               } else {
-                final newCard = Cards(label, color, pictogram, isActive: isActive);
-                cardsList.add(newCard); 
-                _reorganizeCards(); 
+                final newCard =
+                    Cards(label, color, pictogram, isActive: isActive);
+                cardsList.add(newCard);
+                _reorganizeCards();
               }
             });
           },
@@ -127,7 +129,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// Reorganiza os cards para que os inativos estejam sempre no final
   void _reorganizeCards() {
     final activeCards = cardsList.where((card) => card.isActive).toList();
     final inactiveCards = cardsList.where((card) => !card.isActive).toList();
@@ -157,7 +158,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: const Icon(Icons.home),
               onPressed: () {
-                _onItemTapped(0);
+                // Voltar para a tela inicial
               },
               tooltip: 'Home',
             ),
@@ -168,9 +169,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        title: Text(
-          _selectedIndex == 0 ? 'Comunicação' : 'Configurações',
-          style: const TextStyle(
+        title: const Text(
+          'Comunicação',
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -217,30 +218,23 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              _onItemTapped(1);
-            },
+            onPressed: _navigateToSettings,
             tooltip: 'Configurações',
           ),
         ],
       ),
-      body: _selectedIndex == 0
-          ? Communication(
-              cardsList: cardsList,
-              selectedWords: selectedWords,
-              addWord: addWord,
-              clearWords: clearWords,
-              addNewCard: _addNewCard,
-              isMenuVisible: _isMenuVisible,
-              toggleMenu: _toggleMenu,
-              isEditMode: _isEditMode,
-              columns: _columns,
-              editCard: _editCard,
-            )
-          : Settings(
-              currentColumns: _columns,
-              onColumnsChanged: _onColumnsChanged,
-            ),
+      body: Communication(
+        cardsList: cardsList,
+        selectedWords: selectedWords,
+        addWord: addWord,
+        clearWords: clearWords,
+        addNewCard: _addNewCard,
+        isMenuVisible: _isMenuVisible,
+        toggleMenu: _toggleMenu,
+        isEditMode: _isEditMode,
+        columns: _columns,
+        editCard: _editCard,
+      ),
     );
   }
 }
