@@ -3,7 +3,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
-import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class Communication extends StatefulWidget {
   final List<Cards> cardsList;
@@ -11,7 +10,7 @@ class Communication extends StatefulWidget {
   final Function addWord;
   final VoidCallback clearWords;
   final VoidCallback addNewCard;
-  final Function(Cards card) editCard; 
+  final Function(Cards card) editCard;
   final bool isMenuVisible;
   final VoidCallback toggleMenu;
   final bool isEditMode;
@@ -66,7 +65,7 @@ class _CommunicationState extends State<Communication> {
 
   @override
   Widget build(BuildContext context) {
-    final int crossAxisCount = widget.columns; 
+    final int crossAxisCount = widget.columns;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double menuWidth = screenWidth > 800 ? screenWidth * 0.2 : screenWidth * 0.3;
 
@@ -175,80 +174,89 @@ class _CommunicationState extends State<Communication> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final availableWidth = constraints.maxWidth; 
-                    final pictogramScale = widget.isMenuVisible ? 0.95 : 1.0; 
-                    final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5); 
+                    final availableWidth = constraints.maxWidth;
+                    final pictogramScale = widget.isMenuVisible ? 0.95 : 1.0;
+                    final cardWidth = (availableWidth - 64) / (crossAxisCount + 0.5);
                     final cardSpacing = (availableWidth - 64 - (crossAxisCount * cardWidth)) / (crossAxisCount - 1);
-              
+
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0), 
-                      child: widget.isEditMode
-                        ? ReorderableGridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossAxisCount,
-                              crossAxisSpacing: cardSpacing,
-                              mainAxisSpacing: cardSpacing,
-                              childAspectRatio: 1,
-                            ),
-                            itemCount: widget.cardsList.length,
-                            itemBuilder: (context, index) {
-                              final card = widget.cardsList[index];
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: cardSpacing,
+                          mainAxisSpacing: cardSpacing,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: widget.isEditMode
+                            ? widget.cardsList.length
+                            : widget.cardsList.where((card) => card.isActive).length, 
+                        itemBuilder: (context, index) {                          
+                          final cardsToShow = widget.isEditMode
+                              ? widget.cardsList
+                              : widget.cardsList.where((card) => card.isActive).toList();
 
-                              return Opacity(
-                                key: ValueKey(card.id), 
-                                opacity: card.isActive ? 1.0 : 0.3, 
-                                child: CardsWidget(
-                                  button: card,
-                                  pictogramSize: cardWidth * 0.5,
-                                  fontSize: cardWidth * 0.2,
-                                  onTap: () {
-                                    if (widget.isEditMode) {
-                                      widget.editCard(card);
-                                    } else if (card.isActive) {
-                                      widget.addWord(card.label);
-                                    }
-                                  },
+                          final card = cardsToShow[index];
+
+                          if (widget.isEditMode) {                  
+                            return Draggable<int>(
+                              data: index,
+                              feedback: Material(
+                                type: MaterialType.transparency,
+                                child: SizedBox(
+                                  width: cardWidth,
+                                  height: cardWidth,
+                                  child: CardsWidget(
+                                    button: card,
+                                    pictogramSize: cardWidth * 0.5 * pictogramScale,
+                                    fontSize: cardWidth * 0.2 * pictogramScale,
+                                    onTap: () {},
+                                  ),
                                 ),
-                              );
-                            },
-                            onReorder: (oldIndex, newIndex) {
-                              setState(() {
-                                final card = widget.cardsList.removeAt(oldIndex);
-                                widget.cardsList.insert(newIndex, card);
-                              });
-                            },
-                          )
-                        : GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossAxisCount,
-                              crossAxisSpacing: cardSpacing,
-                              mainAxisSpacing: cardSpacing,
-                              childAspectRatio: 1,
-                            ),
-                            itemCount: widget.cardsList.where((card) => card.isActive).length, 
-                            itemBuilder: (context, index) {
-                              final card = widget.cardsList.where((card) => card.isActive).toList()[index];
-                              return CardsWidget(
-                                key: ValueKey(card),
-                                button: card,
-                                pictogramSize: cardWidth * 0.5 * pictogramScale,
-                                fontSize: cardWidth * 0.2 * pictogramScale,
-                                onTap: () {
-                                  if (widget.isEditMode) {
-                                    widget.editCard(card); 
-                                  } else {
-                                    widget.addWord(card.label); 
-                                  }
+                              ),
+                              childWhenDragging: Container(),
+                              child: DragTarget<int>(
+                                // ignore: deprecated_member_use
+                                onAccept: (fromIndex) {
+                                  setState(() {
+                                    final temp = widget.cardsList[fromIndex];
+                                    widget.cardsList[fromIndex] = widget.cardsList[index];
+                                    widget.cardsList[index] = temp;
+                                  });
                                 },
-                              );
-                            },
-                          ),
-
+                                builder: (context, candidateData, rejectedData) {
+                                  return Opacity(
+                                    opacity: card.isActive ? 1.0 : 0.3,
+                                    child: CardsWidget(
+                                      button: card,
+                                      pictogramSize: cardWidth * 0.5 * pictogramScale,
+                                      fontSize: cardWidth * 0.2 * pictogramScale,
+                                      onTap: () {
+                                        widget.editCard(card);
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          } else {
+                            return CardsWidget(
+                              button: card,
+                              pictogramSize: cardWidth * 0.5 * pictogramScale,
+                              fontSize: cardWidth * 0.2 * pictogramScale,
+                              onTap: () {
+                                if (card.isActive) {
+                                  widget.addWord(card.label); 
+                                }
+                              },
+                            );
+                          }
+                        },
+                      ),
                     );
                   },
                 ),
               ),
-
             ],
           ),
         ),
