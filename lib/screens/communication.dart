@@ -3,6 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
+import '../widgets/menu_button_widget.dart';
 
 class Communication extends StatefulWidget {
   final List<Cards> cardsList;
@@ -153,20 +154,23 @@ class _CommunicationState extends State<Communication> {
                     ),
                   ),
                   child: widget.isMenuVisible
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListTile(
-                              leading: const Icon(Icons.settings),
-                              title: const Text("Configurações"),
-                              onTap: widget.toggleMenu,
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.info),
-                              title: const Text("Sobre"),
-                              onTap: widget.toggleMenu,
-                            ),
-                          ],
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              MenuButtonWidget(
+                                icon: Icons.settings,
+                                label: "Configurações",
+                                onTap: widget.toggleMenu,
+                              ),
+                              const SizedBox(height: 10),
+                              MenuButtonWidget(
+                                icon: Icons.info,
+                                label: "Sobre",
+                                onTap: widget.toggleMenu,
+                              ),
+                            ],
+                          ),
                         )
                       : null,
                 ),
