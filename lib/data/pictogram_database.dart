@@ -8,8 +8,8 @@ class PictogramDatabase {
     'assets/pictograms/banheiro.png': ['banheiro', 'higiene', 'privada', 'toalete', 'sanitário'],
     'assets/pictograms/batatas_fritas.png': ['batatas fritas', 'batatas', 'snack', 'comida', 'fritas'],
     'assets/pictograms/beringela.png': ['beringela', 'vegetal', 'comida', 'verdura'],
-    'assets/pictograms/brincar.png': ['brincar', 'jogar', 'diversão', 'atividade', 'criança'],
     'assets/pictograms/brincar_bola.png': ['brincar bola', 'bola', 'esporte', 'jogar', 'diversão'],
+    'assets/pictograms/brincar.png': ['brincar', 'jogar', 'diversão', 'atividade', 'criança'],
     'assets/pictograms/cenoura.png': ['cenoura', 'vegetal', 'verdura', 'comida', 'salada'],
     'assets/pictograms/chocolate.png': ['chocolate', 'doce', 'comida', 'sobremesa'],
     'assets/pictograms/chocolates.png': ['chocolates', 'doces', 'comida', 'sobremesa'],
@@ -29,8 +29,8 @@ class PictogramDatabase {
     'assets/pictograms/nao_quero.png': ['nao quero', 'nao', 'negaçao', 'recusa'],
     'assets/pictograms/nao.png': ['nao', 'negaçao', 'recusar', 'proibiçao'],
     'assets/pictograms/pessego.png': ['pêssego', 'fruta', 'comida', 'alimento'],
-    'assets/pictograms/quero_mais.png': ['quero mais', 'quero', 'mais', 'adicionar', 'aumentar'],
     'assets/pictograms/quero.png': ['quero', 'desejo', 'sim', 'aceitar'],
+    'assets/pictograms/quero_mais.png': ['quero mais', 'quero', 'mais', 'adicionar', 'aumentar'],
     'assets/pictograms/salsichas.png': ['salsichas', 'carne', 'comida', 'alimento'],
   };
 

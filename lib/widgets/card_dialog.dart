@@ -175,7 +175,7 @@ class _CardDialogState extends State<CardDialog> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 19),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
