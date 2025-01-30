@@ -7,6 +7,7 @@ import '../widgets/menu_button_widget.dart';
 
 class Communication extends StatefulWidget {
   final List<Cards> cardsList;
+  final List<Cards> menuCardsList;
   final List<String> selectedWords;
   final Function addWord;
   final VoidCallback clearWords;
@@ -19,6 +20,7 @@ class Communication extends StatefulWidget {
 
   Communication({
     required this.cardsList,
+    required this.menuCardsList,
     required this.selectedWords,
     required this.addWord,
     required this.clearWords,
@@ -62,6 +64,12 @@ class _CommunicationState extends State<Communication> {
     if (text.isNotEmpty) {
       await flutterTts.speak(text);
     }
+  }
+
+  void _addNewMenuCard() {
+    setState(() {
+      widget.menuCardsList.add(Cards("Novo Card", Colors.grey, "assets/icons/gear.svg"));
+    });
   }
 
   @override
@@ -154,25 +162,38 @@ class _CommunicationState extends State<Communication> {
                     ),
                   ),
                   child: widget.isMenuVisible
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              MenuButtonWidget(
-                                icon: Icons.settings,
-                                label: "Configurações",
-                                onTap: widget.toggleMenu,
+                    ? Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Column(
+                                  children: widget.menuCardsList.map((card) => Padding(
+                                        padding: const EdgeInsets.only(bottom: 10),
+                                        child: MenuButtonWidget(
+                                          icon: Icons.extension,
+                                          label: card.label,
+                                          onTap: () {},
+                                        ),
+                                      )).toList(),
+                                ),
                               ),
-                              const SizedBox(height: 10),
-                              MenuButtonWidget(
-                                icon: Icons.info,
-                                label: "Sobre",
-                                onTap: widget.toggleMenu,
+                            ),
+                            Positioned(
+                              bottom: 10,
+                              right: 10,
+                              child: FloatingActionButton(
+                                onPressed: _addNewMenuCard,
+                                backgroundColor: const Color(0xFF4C4C4C),
+                                child: const Icon(Icons.add, color: Colors.white),
                               ),
-                            ],
-                          ),
-                        )
-                      : null,
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
                 ),
               ),
               Expanded(
@@ -194,15 +215,15 @@ class _CommunicationState extends State<Communication> {
                         ),
                         itemCount: widget.isEditMode
                             ? widget.cardsList.length
-                            : widget.cardsList.where((card) => card.isActive).length, 
-                        itemBuilder: (context, index) {                          
+                            : widget.cardsList.where((card) => card.isActive).length,
+                        itemBuilder: (context, index) {
                           final cardsToShow = widget.isEditMode
                               ? widget.cardsList
                               : widget.cardsList.where((card) => card.isActive).toList();
 
                           final card = cardsToShow[index];
 
-                          if (widget.isEditMode) {                  
+                          if (widget.isEditMode) {
                             return Draggable<int>(
                               data: index,
                               feedback: Material(
@@ -250,7 +271,7 @@ class _CommunicationState extends State<Communication> {
                               fontSize: cardWidth * 0.2 * pictogramScale,
                               onTap: () {
                                 if (card.isActive) {
-                                  widget.addWord(card.label); 
+                                  widget.addWord(card.label);
                                 }
                               },
                             );

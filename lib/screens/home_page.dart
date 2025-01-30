@@ -4,6 +4,7 @@ import 'communication.dart';
 import 'settings.dart';
 import 'historyScreen.dart';
 import '../widgets/card_dialog.dart';
+import '../widgets/menu_button_widget.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Cards> cardsList = [];
+  List<Cards> menuCardsList = [];
   List<String> selectedWords = [];
   bool _isMenuVisible = false;
   bool _isEditMode = false;
@@ -225,6 +227,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Communication(
         cardsList: cardsList,
+        menuCardsList: menuCardsList,
         selectedWords: selectedWords,
         addWord: addWord,
         clearWords: clearWords,
