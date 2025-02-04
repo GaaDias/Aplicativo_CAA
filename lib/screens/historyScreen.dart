@@ -1,68 +1,104 @@
 import 'package:flutter/material.dart';
+import '../data/database_helper.dart';
 
-class HistoryScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> history = [
-    {
-      "phrase": "Quero brincar",
-      "timestamp": DateTime.now().subtract(Duration(days: 1)),
-    },
-    {
-      "phrase": "Estou com fome",
-      "timestamp": DateTime.now().subtract(Duration(days: 2)),
-    },
-    {
-      "phrase": "Preciso de ajuda",
-      "timestamp": DateTime.now().subtract(Duration(days: 3)),
-    },
-  ];
+class HistoryScreen extends StatefulWidget {
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
 
-  String formatDate(DateTime dateTime) {
-    return "${dateTime.day}/${dateTime.month}/${dateTime.year} - ${dateTime.hour}:${dateTime.minute}";
+class _HistoryScreenState extends State<HistoryScreen> {
+  List<Map<String, dynamic>> history = [];
+
+  @override
+  void initState() {
+    super.initState();
+    DatabaseHelper.deleteOldPhrases(); // Remove frases antigas automaticamente
+    _loadHistory(30);
   }
+
+  // Função para carregar o histórico do banco de dados
+  Future<void> _loadHistory(int days) async {
+    final data = await DatabaseHelper.getHistoryFiltered(days); // Agora está correto!
+
+    setState(() {
+      history = data;
+    });
+
+    print("Carregando frases dos últimos $days dias.");
+  }
+
+  String formatDate(String timestamp) {
+    DateTime dateTime = DateTime.parse(timestamp);
+
+    // Formatar dia e mês com zero à esquerda, se necessário
+    String day = dateTime.day.toString().padLeft(2, '0');
+    String month = dateTime.month.toString().padLeft(2, '0');
+    String year = dateTime.year.toString();
+
+    // Formatar hora e minuto com zero à esquerda
+    String hour = dateTime.hour.toString().padLeft(2, '0');
+    String minute = dateTime.minute.toString().padLeft(2, '0');
+
+    return "$day/$month/$year - $hour:$minute";
+  }
+
+  int selectedDays = 30;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Histórico de Frases",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text("Monitoramento de Frases", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF4C4C4C),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: history.isEmpty
-          ? const Center(
-              child: Text(
-                "Nenhum histórico disponível.",
-                style: TextStyle(fontSize: 16),
-              ),
-            )
-          : ListView.builder(
-              itemCount: history.length,
-              itemBuilder: (context, index) {
-                final item = history[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    title: Text(
-                      item["phrase"],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text("Criado em: ${formatDate(item["timestamp"])}"),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text("Filtrar por período:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 15),
+                DropdownButton<int>(
+                  value: selectedDays,
+                  items: [
+                    DropdownMenuItem(value: 7, child: Text("Últimos 7 dias")),
+                    DropdownMenuItem(value: 15, child: Text("Últimos 15 dias")),
+                    DropdownMenuItem(value: 30, child: Text("Últimos 30 dias")),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedDays = value;
+                        _loadHistory(selectedDays); // Recarrega o histórico com o novo filtro
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: history.isEmpty
+                ? const Center(child: Text("Nenhum histórico disponível.", style: TextStyle(fontSize: 16)))
+                : ListView.builder(
+                    itemCount: history.length,
+                    itemBuilder: (context, index) {
+                      final item = history[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: ListTile(
+                          title: Text(item["phrase"], style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text("Usada em: ${formatDate(item["timestamp"])}"),
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
 }

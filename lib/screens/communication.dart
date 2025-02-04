@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../models/cards.dart';
 import '../widgets/cards_widget.dart';
 import '../widgets/menu_button_widget.dart';
+import '../data/database_helper.dart';
 
 class Communication extends StatefulWidget {
   final List<Cards> cardsList;
@@ -62,7 +63,9 @@ class _CommunicationState extends State<Communication> {
   Future<void> _speakContainerContent() async {
     String text = widget.selectedWords.join(" ");
     if (text.isNotEmpty) {
+      print("Falando: $text"); // Verifica se a função está sendo executada
       await flutterTts.speak(text);
+      await DatabaseHelper.savePhrase(text); // Salva no histórico
     }
   }
 
