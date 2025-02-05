@@ -23,8 +23,6 @@ class DatabaseHelper {
 
     String localTimestamp = now.toIso8601String(); // Salva o horário correto
 
-    print("Salvando frase: $phrase às $localTimestamp"); // Debug
-
     await db.insert(
       'history',
       {'phrase': phrase, 'timestamp': localTimestamp},
@@ -50,8 +48,6 @@ class DatabaseHelper {
       where: "timestamp < ?",
       whereArgs: [oneMonthAgo.toIso8601String()],
     );
-
-    print("Frases mais antigas que 30 dias foram removidas.");
   }
 
   // Pega o historico filtrado
@@ -69,5 +65,11 @@ class DatabaseHelper {
     );
 
     return data;
+  }
+
+  // Deleta o historico (vai ser usado apenas para teste)
+  static Future<void> clearHistory() async {
+    final db = await _openDatabase();
+    await db.delete('history'); // Remove todas as frases do histórico
   }
 }

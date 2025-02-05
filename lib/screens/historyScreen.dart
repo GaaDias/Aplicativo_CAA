@@ -23,8 +23,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     setState(() {
       history = data;
     });
-
-    print("Carregando frases dos últimos $days dias.");
   }
 
   String formatDate(String timestamp) {
@@ -57,25 +55,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Filtrar por período:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(width: 15),
-                DropdownButton<int>(
-                  value: selectedDays,
-                  items: [
-                    DropdownMenuItem(value: 7, child: Text("Últimos 7 dias")),
-                    DropdownMenuItem(value: 15, child: Text("Últimos 15 dias")),
-                    DropdownMenuItem(value: 30, child: Text("Últimos 30 dias")),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        selectedDays = value;
-                        _loadHistory(selectedDays); // Recarrega o histórico com o novo filtro
-                      });
-                    }
+                // BOTÃO PARA LIMPAR HISTÓRICO (Fácil de remover depois)
+                TextButton(
+                  onPressed: () async {
+                    await DatabaseHelper.clearHistory();
+                    _loadHistory(selectedDays);
                   },
+                  child: const Text("Limpar Histórico", style: TextStyle(color: Colors.red)),
+                ),
+
+                // FILTRO DE PERÍODO
+                Row(
+                  children: [
+                    const Text("Filtrar por período: "),
+                    const SizedBox(width: 15),
+                    DropdownButton<int>(
+                      value: selectedDays,
+                      items: [
+                        DropdownMenuItem(value: 7, child: Text("Últimos 7 dias")),
+                        DropdownMenuItem(value: 15, child: Text("Últimos 15 dias")),
+                        DropdownMenuItem(value: 30, child: Text("Últimos 30 dias")),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedDays = value;
+                            _loadHistory(selectedDays);
+                          });
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
