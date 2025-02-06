@@ -27,5 +27,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/f7--chat-bubble-fill.svg 
+    - assets/icons/f7--chat-bubble-fill.svg
+    - assets/images/clinica.jpeg
     - assets/pictograms/

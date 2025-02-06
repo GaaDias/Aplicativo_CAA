@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class MenuButtonWidget extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon; // Agora opcional
   final String label;
   final VoidCallback onTap;
 
   const MenuButtonWidget({
     Key? key,
-    required this.icon,
+    this.icon,
     required this.label,
     required this.onTap,
   }) : super(key: key);
@@ -33,9 +33,17 @@ class MenuButtonWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 28, color: Colors.black),
+            if (icon != null)
+              Icon(icon, size: 28, color: Colors.black)
+            else
+              // Se não houver ícone, pode ser usado um espaço em branco ou nada:
+              SizedBox(height: 28),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black)),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
           ],
         ),
       ),

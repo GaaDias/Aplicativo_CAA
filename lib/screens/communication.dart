@@ -71,7 +71,8 @@ class _CommunicationState extends State<Communication> {
 
   void _addNewMenuCard() {
     setState(() {
-      widget.menuCardsList.add(Cards("Novo Card", Colors.grey, "assets/icons/gear.svg"));
+      // Cria um novo card sem ícone (pictogram vazio)
+      widget.menuCardsList.add(Cards("Novo Card", Colors.grey, ""));
     });
   }
 
@@ -165,38 +166,43 @@ class _CommunicationState extends State<Communication> {
                     ),
                   ),
                   child: widget.isMenuVisible
-                    ? Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Stack(
-                          children: [
-                            Positioned.fill(
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Column(
-                                  children: widget.menuCardsList.map((card) => Padding(
-                                        padding: const EdgeInsets.only(bottom: 10),
-                                        child: MenuButtonWidget(
-                                          icon: Icons.extension,
-                                          label: card.label,
-                                          onTap: () {},
-                                        ),
-                                      )).toList(),
+                      ? Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    children: widget.menuCardsList.map((card) => Padding(
+                                          padding: const EdgeInsets.only(bottom: 10),
+                                          child: MenuButtonWidget(
+                                            // Se o pictogram estiver vazio, não exibe ícone
+                                            icon: card.pictogram.isEmpty ? null : Icons.extension,
+                                            label: card.label,
+                                            onTap: () {
+                                              if (widget.isEditMode) {
+                                                widget.editCard(card);
+                                              }
+                                            },
+                                          ),
+                                        )).toList(),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              bottom: 10,
-                              right: 10,
-                              child: FloatingActionButton(
-                                onPressed: _addNewMenuCard,
-                                backgroundColor: const Color(0xFF4C4C4C),
-                                child: const Icon(Icons.add, color: Colors.white),
+                              Positioned(
+                                bottom: 10,
+                                right: 10,
+                                child: FloatingActionButton(
+                                  onPressed: _addNewMenuCard,
+                                  backgroundColor: const Color(0xFF4C4C4C),
+                                  child: const Icon(Icons.add, color: Colors.white),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : null,
+                            ],
+                          ),
+                        )
+                      : null,
                 ),
               ),
               Expanded(
