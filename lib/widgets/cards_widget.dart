@@ -7,7 +7,7 @@ class CardsWidget extends StatelessWidget {
   final double fontSize;
   final double pictogramSize;
 
-  CardsWidget({
+  const CardsWidget({
     Key? key,
     required this.button,
     required this.onTap,
@@ -17,6 +17,22 @@ class CardsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Se o caminho começa com "http", usamos Image.network; caso contrário, Image.asset.
+    final Widget pictogramWidget = button.pictogram.startsWith("http")
+        ? Image.network(
+            button.pictogram,
+            width: pictogramSize,
+            height: pictogramSize,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+          )
+        : Image.asset(
+            button.pictogram,
+            width: pictogramSize,
+            height: pictogramSize,
+            fit: BoxFit.contain,
+          );
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -27,12 +43,7 @@ class CardsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              button.pictogram,
-              width: pictogramSize,
-              height: pictogramSize,
-              fit: BoxFit.contain,
-            ),
+            pictogramWidget,
             const SizedBox(height: 5),
             Text(
               button.label,

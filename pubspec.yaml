@@ -18,6 +18,8 @@ dependencies:
   flutter_svg: ^2.0.11
   uuid: ^3.0.6
   sqflite: ^2.4.1
+  dio: ^4.0.0
+  path_provider: ^2.0.9
 
 dev_dependencies:
   flutter_test:

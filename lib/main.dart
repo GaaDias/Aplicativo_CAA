@@ -3,10 +3,10 @@ import 'screens/home_page.dart';
 import 'screens/login_screen.dart';
 
 void main() {
-  runApp(TDSnapApp());
+  runApp(CAALumaApp());
 }
 
-class TDSnapApp extends StatelessWidget {
+class CAALumaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

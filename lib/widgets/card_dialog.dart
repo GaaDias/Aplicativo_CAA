@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/cards.dart';
-import '../data/pictogram_database.dart';
+import '../data/database_helper.dart';
+import '../services/arasaac_api.dart';
+// Se você tiver o módulo de download integrado posteriormente, poderá importá-lo também:
+// import '../services/pictogram_downloader.dart';
 
 class CardDialog extends StatefulWidget {
   final bool isEditMode;
@@ -24,7 +27,7 @@ class _CardDialogState extends State<CardDialog> {
   late String label;
   late String selectedPictogram;
   late Color selectedColor;
-  late bool isActive; 
+  late bool isActive;
 
   @override
   void initState() {
@@ -32,9 +35,8 @@ class _CardDialogState extends State<CardDialog> {
     label = widget.card?.label ?? "";
     selectedPictogram = widget.card?.pictogram ?? "";
     selectedColor = widget.card?.color ?? Colors.blue;
-    isActive = widget.card?.isActive ?? true; 
+    isActive = widget.card?.isActive ?? true;
   }
-
 
   void _confirmDeletion() {
     showDialog(
@@ -46,24 +48,18 @@ class _CardDialogState extends State<CardDialog> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
-              child: const Text(
-                "Cancelar", 
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.black)),
             ),
             ElevatedButton(
               onPressed: () {
                 if (widget.onDelete != null) {
                   widget.onDelete!();
                 }
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
-              child: const Text(
-                "Excluir",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("Excluir", style: TextStyle(color: Colors.black)),
             ),
           ],
         );
@@ -71,6 +67,20 @@ class _CardDialogState extends State<CardDialog> {
     );
   }
 
+  /// Busca o pictograma pela palavra digitada usando a API.
+  Future<void> _fetchPictogram(String keyword) async {
+    final onlineUrl = await ArasaacApi.getPictogramUrlByKeyword(keyword);
+    if (onlineUrl != null) {
+      // Para testes, usamos a URL retornada diretamente.
+      setState(() {
+        selectedPictogram = onlineUrl;
+      });
+    } else {
+      setState(() {
+        selectedPictogram = "";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,32 +98,26 @@ class _CardDialogState extends State<CardDialog> {
     ];
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Stack(
         alignment: Alignment.center,
         children: [
           Center(
             child: Text(
               widget.isEditMode ? "Edição de Card" : "Criação de Card",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ),
           Positioned(
-            right: 0, 
+            right: 0,
             child: Transform.scale(
-              scale: 0.8, 
+              scale: 0.8,
               child: Switch(
-                value: isActive, 
+                value: isActive,
                 onChanged: (value) {
                   setState(() {
-                    isActive = value; 
+                    isActive = value;
                   });
                 },
               ),
@@ -121,7 +125,6 @@ class _CardDialogState extends State<CardDialog> {
           ),
         ],
       ),
-
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -140,19 +143,14 @@ class _CardDialogState extends State<CardDialog> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: selectedPictogram.isNotEmpty
-                            ? Image.asset(
+                            ? Image.network(
                                 selectedPictogram,
                                 fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(child: Icon(Icons.error));
+                                },
                               )
-                            : Center(
-                                child: Text(
-                                  "Imagem",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
+                            : Center(child: Text("Imagem", style: TextStyle(color: Colors.grey, fontSize: 16))),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -181,23 +179,14 @@ class _CardDialogState extends State<CardDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 14),
-                      const Text(
-                        "Palavra",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      const Text("Palavra", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       TextField(
                         onChanged: (value) {
                           label = value;
                         },
-                        onSubmitted: (value) {
-                          setState(() {
-                            selectedPictogram = PictogramDatabase
-                                .getPictogramByKeyword(value)!;
-                          });
+                        onSubmitted: (value) async {
+                          await _fetchPictogram(value);
                         },
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -211,14 +200,7 @@ class _CardDialogState extends State<CardDialog> {
               ],
             ),
             const SizedBox(height: 24),
-            const Text(
-              "Cor do Card",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            const Text("Cor do Card", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
             const SizedBox(height: 16),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -238,12 +220,7 @@ class _CardDialogState extends State<CardDialog> {
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selectedColor == color
-                              ? Colors.black
-                              : Colors.transparent,
-                          width: 2,
-                        ),
+                        border: Border.all(color: selectedColor == color ? Colors.black : Colors.transparent, width: 2),
                       ),
                     ),
                   );
@@ -267,34 +244,26 @@ class _CardDialogState extends State<CardDialog> {
                   _confirmDeletion();
                 },
               ),
-            const SizedBox(width: 20), 
+            const SizedBox(width: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
-                "Cancelar",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.black)),
             ),
             const SizedBox(width: 20),
             ElevatedButton(
               onPressed: () {
                 if (label.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("O campo 'Palavra' não pode estar vazio!"),
-                    ),
+                    const SnackBar(content: Text("O campo 'Palavra' não pode estar vazio!")),
                   );
                   return;
                 }
                 widget.onSave?.call(label, selectedPictogram, selectedColor, isActive);
                 Navigator.of(context).pop();
               },
-              child: const Text(
-                "Salvar",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("Salvar", style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -302,8 +271,10 @@ class _CardDialogState extends State<CardDialog> {
     );
   }
 
-  void _selectPictogram(BuildContext context) {
-    final pictograms = PictogramDatabase.getAllPictograms();
+  void _selectPictogram(BuildContext context) async {
+    // Busca pictogramas já cadastrados no banco (se houver)
+    final pictogramData = await DatabaseHelper.getPictograms();
+    final pictograms = pictogramData.map((p) => p['local_path'] as String).toList();
 
     showDialog(
       context: context,
@@ -322,10 +293,13 @@ class _CardDialogState extends State<CardDialog> {
                     });
                     Navigator.of(context).pop();
                   },
-                  child: Image.asset(
+                  child: Image.network(
                     path,
                     width: 50,
                     height: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error);
+                    },
                   ),
                 );
               }).toList(),

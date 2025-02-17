@@ -5,44 +5,54 @@ class DatabaseHelper {
   static Future<Database> _openDatabase() async {
     return openDatabase(
       join(await getDatabasesPath(), 'communication_history.db'),
-      onCreate: (db, version) {
-        return db.execute(
+      onCreate: (db, version) async {
+        // Tabela para o histórico de frases
+        await db.execute(
           "CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT, phrase TEXT, timestamp TEXT)",
         );
+        // Tabela para os pictogramas
+        await db.execute('''
+          CREATE TABLE pictograms(
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            category TEXT,
+            local_path TEXT,
+            online_url TEXT
+          )
+        ''');
       },
       version: 1,
     );
   }
 
-  // Função para salvar uma frase falada no histórico
+  static Future<void> printTables() async {
+    final db = await _openDatabase();
+    final List<Map<String, dynamic>> tables = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+    print("Tabelas existentes no banco:");
+    for (var table in tables) {
+      print(table['name']);
+    }
+  }
+
+  // Funções para o histórico (já existentes)
   static Future<void> savePhrase(String phrase) async {
     final db = await _openDatabase();
-
-    // Captura a data UTC e ajusta manualmente para o fuso local
-    DateTime now = DateTime.now().toUtc().subtract(Duration(hours: 3)); // Ajuste manual para UTC-3
-
-    String localTimestamp = now.toIso8601String(); // Salva o horário correto
-
+    DateTime now = DateTime.now().toUtc().subtract(Duration(hours: 3));
+    String localTimestamp = now.toIso8601String();
     await db.insert(
       'history',
       {'phrase': phrase, 'timestamp': localTimestamp},
     );
   }
 
-  // Função para recuperar o histórico de frases
   static Future<List<Map<String, dynamic>>> getHistory() async {
     final db = await _openDatabase();
     return await db.query('history', orderBy: 'timestamp DESC');
   }
 
-  // Função para deletar frases antigas
   static Future<void> deleteOldPhrases() async {
     final db = await _openDatabase();
-
-    // Calcula a data de 30 dias atrás
     DateTime oneMonthAgo = DateTime.now().subtract(Duration(days: 30));
-
-    // Deleta todas as frases anteriores a essa data
     await db.delete(
       'history',
       where: "timestamp < ?",
@@ -50,26 +60,44 @@ class DatabaseHelper {
     );
   }
 
-  // Pega o historico filtrado
   static Future<List<Map<String, dynamic>>> getHistoryFiltered(int days) async {
     final db = await _openDatabase();
-
-    // Calcula a data inicial com base no filtro
     DateTime startDate = DateTime.now().subtract(Duration(days: days));
-
     final data = await db.query(
       'history',
       where: "timestamp >= ?",
       whereArgs: [startDate.toIso8601String()],
       orderBy: 'timestamp DESC',
     );
-
     return data;
   }
 
-  // Deleta o historico (vai ser usado apenas para teste)
   static Future<void> clearHistory() async {
     final db = await _openDatabase();
-    await db.delete('history'); // Remove todas as frases do histórico
+    await db.delete('history');
+  }
+
+  // Funções para pictogramas
+  static Future<void> insertPictogram(Map<String, dynamic> pictogram) async {
+    final db = await _openDatabase();
+    await db.insert('pictograms', pictogram, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  static Future<List<Map<String, dynamic>>> getPictograms() async {
+    final db = await _openDatabase();
+    return await db.query('pictograms');
+  }
+
+  static Future<String?> getPictogramLocalPath(String name) async {
+    final db = await _openDatabase();
+    final result = await db.query(
+      'pictograms',
+      where: "LOWER(name) = ?",
+      whereArgs: [name.toLowerCase()],
+    );
+    if (result.isNotEmpty) {
+      return result.first['local_path'] as String;
+    }
+    return null;
   }
 }

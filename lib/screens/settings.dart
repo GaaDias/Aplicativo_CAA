@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'file_list_screen.dart'; // ajuste o caminho conforme sua estrutura de pastas
 
 class Settings extends StatefulWidget {
   final int currentColumns;
@@ -37,31 +38,26 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+  void _navigateToDownloads() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FileListScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF4C4C4C),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         leadingWidth: 150,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            /*IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: (){
-
-              },
-              tooltip: 'Menu',
-            ),*/
             IconButton(
               icon: const Icon(Icons.home),
-              onPressed: () {
-                _navigateToHome();
-              },
+              onPressed: _navigateToHome,
               tooltip: 'Home',
             ),
           ],
@@ -75,6 +71,13 @@ class _SettingsState extends State<Settings> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: _navigateToDownloads,
+            tooltip: 'Downloads',
+          ),
+        ],
       ),
       body: Container(
         color: Colors.white,
@@ -99,7 +102,6 @@ class _SettingsState extends State<Settings> {
                 children: List.generate(9, (index) {
                   int value = index + 2; // Valores de 2 a 10
                   bool isSelected = value == _selectedColumn;
-
                   return GestureDetector(
                     onTap: () => _updateColumns(value),
                     child: AnimatedContainer(
@@ -107,9 +109,7 @@ class _SettingsState extends State<Settings> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.grey.shade900
-                            : Colors.grey.shade200,
+                        color: isSelected ? Colors.grey.shade900 : Colors.grey.shade200,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isSelected ? Colors.black : Colors.grey.shade400,
@@ -138,7 +138,6 @@ class _SettingsState extends State<Settings> {
                 children: List.generate(9, (index) {
                   int value = index + 11; // Valores de 11 a 18
                   bool isSelected = value == _selectedColumn;
-
                   return GestureDetector(
                     onTap: () => _updateColumns(value),
                     child: AnimatedContainer(
@@ -146,9 +145,7 @@ class _SettingsState extends State<Settings> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.grey.shade900
-                            : Colors.grey.shade200,
+                        color: isSelected ? Colors.grey.shade900 : Colors.grey.shade200,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isSelected ? Colors.black : Colors.grey.shade400,
