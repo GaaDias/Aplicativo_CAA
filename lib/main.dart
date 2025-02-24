@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart';
 import 'screens/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(CAALumaApp());
 }
+
 
 class CAALumaApp extends StatelessWidget {
   @override

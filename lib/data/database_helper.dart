@@ -25,14 +25,16 @@ class DatabaseHelper {
     );
   }
 
-  static Future<void> printTables() async {
+  static Future<void> printPictogramsContent() async {
     final db = await _openDatabase();
-    final List<Map<String, dynamic>> tables = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
-    print("Tabelas existentes no banco:");
-    for (var table in tables) {
-      print(table['name']);
+    // Executa a query para obter todo o conteúdo da tabela pictograms
+    final List<Map<String, dynamic>> results = await db.rawQuery("SELECT * FROM pictograms");
+    print("Conteúdo da tabela pictograms:");
+    for (var row in results) {
+      print(row);
     }
   }
+
 
   // Funções para o histórico (já existentes)
   static Future<void> savePhrase(String phrase) async {
@@ -78,6 +80,20 @@ class DatabaseHelper {
   }
 
   // Funções para pictogramas
+  static Future<String?> getPictogramLocalPathById(int pictogramId) async {
+    final db = await _openDatabase();
+    final result = await db.query(
+      'pictograms',
+      columns: ['local_path'],
+      where: "id = ?",
+      whereArgs: [pictogramId],
+    );
+    if (result.isNotEmpty) {
+      return result.first['local_path'] as String;
+    }
+    return null;
+  }
+
   static Future<void> insertPictogram(Map<String, dynamic> pictogram) async {
     final db = await _openDatabase();
     await db.insert('pictograms', pictogram, conflictAlgorithm: ConflictAlgorithm.replace);

@@ -8,8 +8,8 @@ class FileListScreen extends StatefulWidget {
 }
 
 class _FileListScreenState extends State<FileListScreen> {
-  List<FileSystemEntity> _files = [];
-  bool _isLoading = true;
+  List<FileSystemEntity> files = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -22,13 +22,13 @@ class _FileListScreenState extends State<FileListScreen> {
     final pictogramsDir = Directory('${directory.path}/pictograms');
     if (await pictogramsDir.exists()) {
       setState(() {
-        _files = pictogramsDir.listSync();
-        _isLoading = false;
+        files = pictogramsDir.listSync();
+        isLoading = false;
       });
     } else {
       setState(() {
-        _files = [];
-        _isLoading = false;
+        files = [];
+        isLoading = false;
       });
     }
   }
@@ -36,15 +36,13 @@ class _FileListScreenState extends State<FileListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Arquivos Baixados"),
-      ),
-      body: _isLoading
+      appBar: AppBar(title: Text("Pictogramas Baixados")),
+      body: isLoading
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: _files.length,
+              itemCount: files.length,
               itemBuilder: (context, index) {
-                final file = _files[index];
+                final file = files[index];
                 final fileName = file.path.split(Platform.pathSeparator).last;
                 return ListTile(
                   title: Text(fileName),
@@ -52,28 +50,16 @@ class _FileListScreenState extends State<FileListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ImageViewScreen(file: file),
+                        builder: (_) => Scaffold(
+                          appBar: AppBar(title: Text("Visualização")),
+                          body: Center(child: Image.file(File(file.path))),
+                        ),
                       ),
                     );
                   },
                 );
               },
             ),
-    );
-  }
-}
-
-class ImageViewScreen extends StatelessWidget {
-  final FileSystemEntity file;
-  const ImageViewScreen({Key? key, required this.file}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Visualizar Imagem")),
-      body: Center(
-        child: Image.file(File(file.path)),
-      ),
     );
   }
 }

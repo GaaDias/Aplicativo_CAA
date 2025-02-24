@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/cards.dart';
 import '../data/database_helper.dart';
 import '../services/arasaac_api.dart';
-// Se você tiver o módulo de download integrado posteriormente, poderá importá-lo também:
-// import '../services/pictogram_downloader.dart';
+import '../services/pictogram_downloader.dart';
 
 class CardDialog extends StatefulWidget {
   final bool isEditMode;
@@ -69,12 +68,24 @@ class _CardDialogState extends State<CardDialog> {
 
   /// Busca o pictograma pela palavra digitada usando a API.
   Future<void> _fetchPictogram(String keyword) async {
-    final onlineUrl = await ArasaacApi.getPictogramUrlByKeyword(keyword);
-    if (onlineUrl != null) {
-      // Para testes, usamos a URL retornada diretamente.
-      setState(() {
-        selectedPictogram = onlineUrl;
-      });
+    final List<int> ids = await ArasaacApi.getPictogramIdsByKeyword(keyword);
+    if (ids.isNotEmpty) {
+      final int pictogramId = ids.first;
+  
+      String? localPath = await DatabaseHelper.getPictogramLocalPathById(pictogramId); // Correto: usa o método público
+      if (localPath != null && localPath.isNotEmpty) {
+        setState(() {
+          selectedPictogram = localPath;
+        });
+      } else {
+        final String onlineUrl = ArasaacApi.getPictogramUrlById(pictogramId);
+        await PictogramDownloader.checkAndDownloadPictogram(pictogramId.toString(), onlineUrl);
+  
+        final String? newLocalPath = await DatabaseHelper.getPictogramLocalPathById(pictogramId); // Correto: usa o método público
+        setState(() {
+          selectedPictogram = newLocalPath ?? onlineUrl;
+        });
+      }
     } else {
       setState(() {
         selectedPictogram = "";
